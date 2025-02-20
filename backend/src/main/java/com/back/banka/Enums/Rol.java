@@ -1,6 +1,6 @@
 package com.back.banka.Enums;
 
-public enum Role {
-    CLIENT,
+public enum Rol {
+    CLIENTE,
     ADMIN
 }

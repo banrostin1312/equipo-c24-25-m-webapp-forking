@@ -1,6 +1,6 @@
 package com.back.banka.Model;
 
-import com.back.banka.Enums.Role;
+import com.back.banka.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +37,7 @@ import lombok.*;
 
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)
-        private Role rol;
+        private Rol rol;
 
         @Column(nullable = false)
         private boolean status;
