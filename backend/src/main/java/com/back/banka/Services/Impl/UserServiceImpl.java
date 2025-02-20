@@ -4,7 +4,7 @@ import com.back.banka.Dtos.ResponseDto.LoginResponseDto;
 import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
 import com.back.banka.Services.IServices.IUserService;
-import com.back.banka.Utils.JwtService;
+import com.back.banka.Utils.JwtUtil;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,9 +19,9 @@ public class UserServiceImpl implements IUserService {
 
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtService jwtService;
+    private final JwtUtil jwtService;
 
-    public UserServiceImpl( AuthenticationManagerBuilder authenticationManagerBuilder, JwtService jwtService) {
+    public UserServiceImpl(AuthenticationManagerBuilder authenticationManagerBuilder, JwtUtil jwtService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.jwtService = jwtService;
     }
@@ -54,7 +54,7 @@ public class UserServiceImpl implements IUserService {
                 Authentication authentication =
                         authenticationManagerBuilder.getObject().authenticate(authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                String token = this.jwtService.generateToken(authentication);
+                String token = this.jwtService.generateToken(loginRequestDto.getEmail());
                 return LoginResponseDto.builder()
                         .token(token)
                         .build();
