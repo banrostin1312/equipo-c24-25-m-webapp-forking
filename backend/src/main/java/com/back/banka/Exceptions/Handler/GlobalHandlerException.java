@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 
 public class GlobalHandlerException {
@@ -46,5 +47,16 @@ public class GlobalHandlerException {
                 .build();
 
         return new ResponseEntity<>(errorResponseDto,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDenied(AccessDeniedException ex) {
+        ErrorResponseDto  errorResponseDto = ErrorResponseDto.builder()
+                .code(HttpStatus.FORBIDDEN.value())
+                .message(ex.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
+
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.FORBIDDEN);
     }
 }

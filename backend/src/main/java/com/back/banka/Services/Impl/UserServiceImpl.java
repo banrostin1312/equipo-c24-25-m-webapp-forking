@@ -5,6 +5,7 @@ import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
 import com.back.banka.Services.IServices.IUserService;
 import com.back.banka.Utils.JwtService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -61,6 +62,8 @@ public class UserServiceImpl implements IUserService {
                 throw new InvalidCredentialExceptions("Usuario o contraseña incorrectos");
             }catch (CustomAuthenticationException e){
                 throw  new CustomAuthenticationException("Error de autenticacion");
+            } catch (AccessDeniedException exception){
+                throw  new AccessDeniedException(" acceso denegado");
             }
 
     }
