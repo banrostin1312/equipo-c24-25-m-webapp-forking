@@ -5,6 +5,7 @@ import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IUserService;
+import com.back.banka.Utils.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -20,10 +21,12 @@ public class UserServiceImpl implements IUserService {
 
     private  final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final JwtService jwtService;
 
-    public UserServiceImpl(UserRepository userRepository, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.jwtService = jwtService;
     }
 
 
@@ -54,13 +57,14 @@ public class UserServiceImpl implements IUserService {
                 Authentication authentication =
                         authenticationManagerBuilder.getObject().authenticate(authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                String token = this.jwtService.generateToken(authentication);
                 return LoginResponseDto.builder()
-                        .token("Token")
+                        .token(token)
                         .build();
             } catch (InvalidCredentialExceptions exceptions){
                 throw new InvalidCredentialExceptions("Usuario o contraseña incorrectos");
             }catch (CustomAuthenticationException e){
-                throw  new CustomAuthenticationException("Error en autenticacion");
+                throw  new CustomAuthenticationException("Error de autenticacion");
             }
 
     }
