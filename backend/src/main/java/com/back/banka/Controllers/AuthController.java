@@ -2,7 +2,6 @@ package com.back.banka.Controllers;
 
 
 import com.back.banka.Dtos.RequestDto.LoginRequestDto;
-import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
 import com.back.banka.Dtos.ResponseDto.LoginResponseDto;
 import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
 import com.back.banka.Services.IServices.IUserService;
