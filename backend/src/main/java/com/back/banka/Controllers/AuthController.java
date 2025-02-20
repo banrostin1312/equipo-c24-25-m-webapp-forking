@@ -2,6 +2,7 @@ package com.back.banka.Controllers;
 
 import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
 import com.back.banka.Services.IServices.IRegisterService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ public class AuthController {
 
     private final IRegisterService registerService;
 
+    @Autowired
     public AuthController(IRegisterService registerService){
         this.registerService = registerService;
     }

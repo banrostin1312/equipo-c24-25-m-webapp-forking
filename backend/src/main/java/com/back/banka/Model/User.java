@@ -45,6 +45,28 @@ import lombok.*;
         @Column(nullable = false)
         private String DNI;
 
+        public String getEmail(){
+            return email;
+        }
 
+        public String getDNI() {
+            return DNI;
+        }
+
+        public void setDNI(String DNI) {
+            this.DNI = DNI;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
     }
 
