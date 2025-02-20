@@ -27,31 +27,32 @@ public class GlobalHandlerException {
         return new ResponseEntity<>(errorResponseDto,HttpStatus.NOT_FOUND);
     }
 
+
     @ExceptionHandler(InvalidCredentialExceptions.class)
-    private ResponseEntity<ErrorResponseDto> userNotFoundHandlerException(InvalidCredentialExceptions exception){
-        ErrorResponseDto  errorResponseDto = ErrorResponseDto.builder()
-                .code(HttpStatus.BAD_REQUEST.value())
+    public ResponseEntity<ErrorResponseDto> handleInvalidCredentials(InvalidCredentialExceptions exception){
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .code(HttpStatus.UNAUTHORIZED.value())
                 .message(exception.getMessage())
                 .dateCreation(LocalDate.now())
                 .build();
 
-        return new ResponseEntity<>(errorResponseDto,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(CustomAuthenticationException.class)
-    private ResponseEntity<ErrorResponseDto> userNotFoundHandlerException(CustomAuthenticationException exception){
-        ErrorResponseDto  errorResponseDto = ErrorResponseDto.builder()
+    public ResponseEntity<ErrorResponseDto> handleAuthenticationException(CustomAuthenticationException exception){
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(exception.getMessage())
                 .dateCreation(LocalDate.now())
                 .build();
 
-        return new ResponseEntity<>(errorResponseDto,HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDto> handleAccessDenied(AccessDeniedException ex) {
-        ErrorResponseDto  errorResponseDto = ErrorResponseDto.builder()
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
                 .code(HttpStatus.FORBIDDEN.value())
                 .message(ex.getMessage())
                 .dateCreation(LocalDate.now())
