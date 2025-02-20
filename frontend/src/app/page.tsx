@@ -38,7 +38,7 @@ export default function Home() {
 
        </div>
 <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-<div className="bg-black-purple-gradient h-28 mt-6"><h1 className="text-white text-4xl text-center">FOOTER</h1></div>
+<div className="bg-black-purple-gradient h-28 mt-6"><h1 className="text-white text-4xl text-center">FOOTERrrrr</h1></div>
      </div>
 
     
