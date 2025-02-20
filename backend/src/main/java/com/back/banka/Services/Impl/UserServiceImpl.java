@@ -3,7 +3,6 @@ import com.back.banka.Dtos.RequestDto.LoginRequestDto;
 import com.back.banka.Dtos.ResponseDto.LoginResponseDto;
 import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
-import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IUserService;
 import com.back.banka.Utils.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,19 +11,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.naming.AuthenticationException;
 
 @Service
 public class UserServiceImpl implements IUserService {
 
 
 
-    private  final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtService jwtService;
 
-    public UserServiceImpl(UserRepository userRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtService jwtService) {
-        this.userRepository = userRepository;
+    public UserServiceImpl( AuthenticationManagerBuilder authenticationManagerBuilder, JwtService jwtService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.jwtService = jwtService;
     }
@@ -68,4 +64,6 @@ public class UserServiceImpl implements IUserService {
             }
 
     }
+
+
 }

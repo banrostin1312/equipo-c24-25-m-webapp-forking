@@ -2,7 +2,9 @@ package com.back.banka.Controllers;
 
 
 import com.back.banka.Dtos.RequestDto.LoginRequestDto;
+import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
 import com.back.banka.Dtos.ResponseDto.LoginResponseDto;
+import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
 import com.back.banka.Services.IServices.IUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> authenticateUser (@Valid  @RequestBody LoginRequestDto requestDto){
         LoginResponseDto loginResponseDto = this.userService.authenticate(requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(loginResponseDto);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponseDto> register (@Valid  @RequestBody RegisterRequestDto requestDto){
+        RegisterResponseDto loginResponseDto = this.userService.registerUser(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDto);
     }
 }
