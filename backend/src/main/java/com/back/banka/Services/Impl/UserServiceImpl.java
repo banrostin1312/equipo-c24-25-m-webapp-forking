@@ -1,31 +1,22 @@
 package com.back.banka.Services.Impl;
-import com.back.banka.Model.User;
+import com.back.banka.Dtos.RequestDto.LoginRequestDto;
+import com.back.banka.Dtos.ResponseDto.LoginResponseDto;
 import com.back.banka.Repository.UserRepository;
 
+import com.back.banka.Services.IServices.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl {
+public class UserServiceImpl implements IUserService {
 
 
     @Autowired
     private UserRepository userRepository;
 
-    public User obtenerUsuarioPorId(Long id){
-        return userRepository.findById(id).orElseThrow(()-> new RuntimeException("Usuario no encontrado"));
-    }
 
-    public User bloquearUsuario(Long id){
-        User usuario = obtenerUsuarioPorId(id);
-        usuario.setStatus(false);
-        return userRepository.save(usuario);
+    @Override
+    public LoginResponseDto authenticate(LoginRequestDto loginRequestDto) {
+        return null;
     }
-
-    public User desbloquearUsuario(Long id){
-        User usuario = obtenerUsuarioPorId(id);
-        usuario.setStatus(true);
-        return userRepository.save(usuario);
-    }
-
 }
