@@ -16,6 +16,8 @@ export default {
         foreground: "var(--foreground)",
         "line-color":"#25F712",
         "nav-buttons":"#B4DBB8",
+        "green-hover":"#119E1F",
+        "buttons-hover":"#10A51F"
       },
     },
   },
