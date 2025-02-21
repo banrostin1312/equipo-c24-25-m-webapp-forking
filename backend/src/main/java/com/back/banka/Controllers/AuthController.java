@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Data
 @RestController
 @RequestMapping("/api/banca/auth")
 public class AuthController {
@@ -26,11 +28,7 @@ public class AuthController {
     private final IUserService userService;
     private final IRegisterService registerService;
 
-    @Autowired
-    public AuthController(IUserService userService, IRegisterService registerService) {
-        this.userService = userService;
-        this.registerService = registerService;
-    }
+
 
     @Operation(summary = "Autenticar usuario", description = "Autentica un usuario con email y contraseña")
     @ApiResponses(value = {

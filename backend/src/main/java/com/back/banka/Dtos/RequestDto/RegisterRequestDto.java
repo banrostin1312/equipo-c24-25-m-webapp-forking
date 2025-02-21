@@ -27,23 +27,4 @@ public class RegisterRequestDto {
     @NotBlank(message = "Campo obligatorio")
     private String DNI;
 
-    public String getEmail() {
-        return email;
-    }
-
-    public @NotBlank(message = "Campo obligatorio") String getPassword() {
-        return password;
-    }
-
-    public void setPassword(@NotBlank(message = "Campo obligatorio") String password) {
-        this.password = password;
-    }
-
-    public @NotBlank(message = "Campo obligatorio") String getDNI() {
-        return DNI;
-    }
-
-    public void setDNI(@NotBlank(message = "Campo obligatorio") String DNI) {
-        this.DNI = DNI;
-    }
 }
