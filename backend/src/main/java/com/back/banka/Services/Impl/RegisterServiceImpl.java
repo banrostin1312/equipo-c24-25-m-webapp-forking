@@ -31,8 +31,8 @@ public class RegisterServiceImpl implements IRegisterService {
     //Registra un usuario solo si el correo aún no está registrado.
     public String registerUser(RegisterRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            return "Correo ya registrado. Intenta iniciar sesión o ingresa un correo distinto.";
-        } else {
+            throw new UserAlreadyExistsException ("Correo ya registrado. Intenta iniciar sesión o ingresa un correo distinto.");
+        }
             User user = new User();
             user.setName(request.getName());
             user.setAge(request.getAge());
@@ -42,9 +42,9 @@ public class RegisterServiceImpl implements IRegisterService {
             user.setDNI(request.getDNI());
             user.setRole(Rol.CLIENTE);
 
-            userRepository.save(user);
+            User savedUser = userRepository.save(user);
             emailService.sendEmail(user.getEmail(), "¡Registro exitoso!/n", "Bienvenido a Luma");
-            return "¡Registro Exitoso!";
+            return new RegisterRequestDto("¡Registro Exitoso!", savedUser.getId());
         }
     }
 

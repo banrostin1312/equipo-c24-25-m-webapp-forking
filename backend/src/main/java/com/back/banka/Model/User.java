@@ -1,12 +1,11 @@
 package com.back.banka.Model;
-
 import com.back.banka.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
 
 
     @Entity
-    @Table(name = "usuarios")
+    @Table(name = "users")
     @Getter
     @Setter
     @Data

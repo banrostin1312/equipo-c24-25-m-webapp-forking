@@ -46,13 +46,18 @@ public class AuthController {
 
 
     //Request para registrar nuevo usuario
+    @Operation(summary = "Registrar usuario", description = "Registra un nuevo usuario en la aplicación")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuario registrado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta (datos inválidos)"),
+            @ApiResponse(responseCode = "409", description = "El usuario ya está registrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/registrarse")
-    public ResponseEntity<String> register(@RequestBody RegisterRequestDto request){
-        String response = registerService.registerUser(request);
-        if (response.startsWith("Error")){
-            return ResponseEntity.badRequest().body(response);
-        }
-        return ResponseEntity.ok(response);
+    public ResponseEntity<RegisterResponseDto> register(@Valid @RequestBody RegisterRequestDto request){
+        RegisterResponseDto response = registerService.registerUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
 }
