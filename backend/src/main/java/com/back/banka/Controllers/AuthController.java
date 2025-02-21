@@ -2,13 +2,16 @@ package com.back.banka.Controllers;
 
 
 import com.back.banka.Dtos.RequestDto.LoginRequestDto;
+import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
 import com.back.banka.Dtos.ResponseDto.LoginResponseDto;
 import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
+import com.back.banka.Services.IServices.IRegisterService;
 import com.back.banka.Services.IServices.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +20,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Data
 @RestController
 @RequestMapping("/api/banca/auth")
 public class AuthController {
 
     private final IUserService userService;
+    private final IRegisterService registerService;
 
-    @Autowired
-    public AuthController(IUserService userService) {
-        this.userService = userService;
-    }
+
 
     @Operation(summary = "Autenticar usuario", description = "Autentica un usuario con email y contraseña")
     @ApiResponses(value = {
@@ -39,6 +41,18 @@ public class AuthController {
     public ResponseEntity<LoginResponseDto> authenticateUser (@Valid  @RequestBody LoginRequestDto requestDto){
         LoginResponseDto loginResponseDto = this.userService.authenticate(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDto);
+    }
+
+
+
+    //Request para registrar nuevo usuario
+    @PostMapping("/registrarse")
+    public ResponseEntity<String> register(@RequestBody RegisterRequestDto request){
+        String response = registerService.registerUser(request);
+        if (response.startsWith("Error")){
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok(response);
     }
 
 }
