@@ -17,33 +17,4 @@ public class ErrorResponseDto {
     private int code;
     private LocalDate dateCreation;
 
-    public ErrorResponseDto(String message, int code, LocalDate dateCreation) {
-        this.message = message;
-        this.code = code;
-        this.dateCreation = dateCreation;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public LocalDate getDateCreation() {
-        return dateCreation;
-    }
-
-    public void setDateCreation(LocalDate dateCreation) {
-        this.dateCreation = dateCreation;
-    }
 }
