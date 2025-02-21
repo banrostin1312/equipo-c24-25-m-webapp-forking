@@ -5,6 +5,8 @@ import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
 import com.back.banka.Exceptions.Custom.UserNotFoundException;
 import com.back.banka.Exceptions.Dtos.ErrorResponseDto;
+import lombok.Builder;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 
+@Builder
+@Getter
 public class GlobalHandlerException {
 
     //lanzadores
