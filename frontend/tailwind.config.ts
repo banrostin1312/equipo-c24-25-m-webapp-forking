@@ -15,6 +15,7 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         "line-color":"#25F712",
+        "nav-buttons":"#B4DBB8",
       },
     },
   },
