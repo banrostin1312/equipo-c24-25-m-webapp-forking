@@ -2,13 +2,12 @@ package com.back.banka.Dtos.ResponseDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@Builder
+@Data
 @AllArgsConstructor
+@Builder
 public class RegisterResponseDto {
-    private String email;
+    private String message;
+    private Long userId;
 }
