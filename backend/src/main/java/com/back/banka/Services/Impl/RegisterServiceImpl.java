@@ -6,20 +6,20 @@ import com.back.banka.Model.User;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IRegisterService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-@AllArgsConstructor
-
 public class RegisterServiceImpl implements IRegisterService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailServiceImpl emailService;
 
+    @Autowired
     public RegisterServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailServiceImpl emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
