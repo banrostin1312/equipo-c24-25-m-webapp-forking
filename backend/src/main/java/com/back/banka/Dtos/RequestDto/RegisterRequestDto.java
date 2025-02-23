@@ -1,5 +1,6 @@
 package com.back.banka.Dtos.RequestDto;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ public class RegisterRequestDto {
     @NotBlank(message = "Campo obligatorio")
     private String name;
     @NotNull(message = "Campo obligatorio")
+
     private int age;
     @NotBlank(message = "Campo obligatorio")
     @Email(message = "Formato inválido")

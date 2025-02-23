@@ -1,7 +1,7 @@
 package com.back.banka.Services.IServices;
 
 import com.back.banka.Dtos.RequestDto.LoginRequestDto;
-import com.back.banka.Dtos.ResponseDto.LoginResponseDto;
+import com.back.banka.Dtos.ResponseDto.TokenResponseDto;
 
 public interface IUserService {
 
@@ -11,6 +11,9 @@ public interface IUserService {
      * se devuelve token de autenticacion(JWT)
      * @return LoginResponseDto
      * */
-    LoginResponseDto authenticate(LoginRequestDto loginRequestDto);
+    TokenResponseDto authenticate(LoginRequestDto loginRequestDto);
+    TokenResponseDto refreshToken(String authHeader);
+
+
 
 }

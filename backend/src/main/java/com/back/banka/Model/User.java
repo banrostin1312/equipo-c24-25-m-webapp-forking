@@ -3,8 +3,10 @@ import com.back.banka.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 
-    @Entity
+
+@Entity
     @Table(name = "users")
     @Getter
     @Setter
@@ -12,7 +14,6 @@ import lombok.*;
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-
     public class User {
 
         @Id
@@ -43,6 +44,9 @@ import lombok.*;
 
         @Column(nullable = false)
         private String DNI;
+
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+        private List<Tokens> tokens;
 
         public String getEmail(){
             return email;
