@@ -21,9 +21,9 @@ const MyCarousel = () => {
   };
 
   return (
-    <div id="default-carousel" className="relative w-full" data-carousel="slide">
+    <div id="default-carousel" className="relative w-full mt-6" data-carousel="slide">
       {/* Carousel wrapper */}
-      <div className=" h-56 overflow-hidden rounded-lg md:h-[500px]">
+      <div className=" h-36 overflow-hidden rounded-lg md:h-[500px]">
         {/* Current Image with transition effect */}
         {images.map((src, index) => (
           <div
@@ -50,7 +50,7 @@ const MyCarousel = () => {
         className="absolute top-1/2 left-0 z-20 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none transform -translate-y-1/2"
         onClick={handlePrev}
       >
-        <span className="inline-flex items-center justify-center  w-6 h-6 md:w-10 md:h-10 rounded-full bg-white/30 group-hover:bg-white/50 md:mb-20 mb-28">
+        <span className="inline-flex items-center justify-center  w-6 h-6 md:w-10 md:h-10 rounded-full bg-white/30 group-hover:bg-white/50 md:mb-20 mb-12">
           <img src="/arrow-left.svg" alt="arrow left" />
         </span>
       </button>
@@ -59,7 +59,7 @@ const MyCarousel = () => {
         className="absolute top-1/2 right-0 z-20 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none transform -translate-y-1/2"
         onClick={handleNext}
       >
-        <span className="inline-flex items-center justify-center w-6 h-6 md:w-10 md:h-10 rounded-full bg-white/30 group-hover:bg-white/50 md:mb-20 mb-28">
+        <span className="inline-flex items-center justify-center w-6 h-6 md:w-10 md:h-10 rounded-full bg-white/30 group-hover:bg-white/50 md:mb-20 mb-12">
           <img src="/arrow-right.svg" alt="arrow right" />
         </span>
       </button>

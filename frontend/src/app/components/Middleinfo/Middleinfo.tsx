@@ -9,7 +9,7 @@ const Middleinfo: React.FC = () => {
   return (
 
     <div>
-      <section className="mt-12 md:space-y-20">
+      <section className=" md:space-y-20">
         <div className="flex flex-col md:flex-row justify-center items-center space-x-4 md:space-x-32 ">
           <Image height={126} width={126} src="/persona3.png" alt="img1 middle" className="md:w-[226px] md:h-[226px]"></Image>
           <div className="flex flex-col justify-center items-center space-y-3 md:flex-row ">
