@@ -42,7 +42,7 @@ const Middleinfo: React.FC = () => {
           <div className="flex flex-col justify-center items-center space-y-3 md:flex-row ">
             <div className="flex flex-col justify-center items-center space-y-3">
               <h2 className="text-xl text-middle-title md:text-4xl md:mr-28">¿Cómo evitar estafas?</h2>
-              <p className="w-full max-w-md text-center md:text-left text-sm md:text-xl">Optimizá tus recursos, reducí costos y llevá tu negocio o emprendimiento al siguiente nivel. Descubrí soluciones eficientes que te ayudarán a maximizar tu rentabilidad y hacer crecer tu proyecto de manera inteligente.</p>
+              <p className="w-full max-w-md text-center md:text-left text-sm md:text-xl">Optimizá tus recursos, reducí costos y llevá tu negocio o emprendimiento al siguiente nivel. Descubrí soluciones eficientes que te ayudarán a maximizar tu rentabilidad y hacer crecer tu proyecto de manera inteligente..</p>
             </div>
             <div className="flex md:flex-row justify-center items-center space-x-0.5 md:space-x-1 text-middle-title">
               <button className="animated-button">
