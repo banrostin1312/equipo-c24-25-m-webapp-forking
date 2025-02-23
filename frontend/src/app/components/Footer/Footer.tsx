@@ -1,4 +1,5 @@
-import { ImgProps } from "next/dist/shared/lib/get-img-props"
+import Link from "next/link"
+
 
 
 const Footer: React.FC = () => {
@@ -97,7 +98,7 @@ const Footer: React.FC = () => {
 
                 </ul>
             </div>
-            <div className="flex justify-center items-center md:flex md:justify-start"> <a href="/"><img src="/LOGO.png" alt="" className="w-[178px] h-[102px]"/></a></div>
+            <div className="flex justify-center items-center md:flex md:justify-start"> <Link href={"/"}><img src="/LOGO.png" alt="" className="w-[178px] h-[102px]"/></Link></div>
         </div>
     )
 }
