@@ -1,7 +1,9 @@
 package com.back.banka.Config;
 
 import com.back.banka.Services.Impl.UserDetailsServiceImpl;
+import com.back.banka.Utils.JwtAuthorizationFilter;
 import com.back.banka.Utils.JwtEntryPoint;
+import com.back.banka.Utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -14,15 +16,25 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return new UserDetailsServiceImpl();
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
+
+    public SecurityConfig(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
     }
+
+    @Bean
+    public JwtAuthorizationFilter jwtAuthenticationFilter() {
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
+    }
+
 
     @Bean
     public JwtEntryPoint jwtEntryPoint(){
@@ -34,10 +46,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
+
     @Bean
      public  AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
@@ -55,10 +69,16 @@ public class SecurityConfig {
                                         "/v3/api-docs",
                                         "/v3/api-docs/swagger-config").permitAll()
                         .anyRequest().authenticated())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))
-                .sessionManagement(
-                        manage ->
-                                manage.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(jwtEntryPoint())
+                )
+                .sessionManagement(manage ->
+                                manage.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                )
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
 
    return  http.build();
     }
