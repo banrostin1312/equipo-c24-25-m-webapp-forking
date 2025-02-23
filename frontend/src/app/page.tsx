@@ -7,7 +7,7 @@ import Separacionseccion2 from "./components/Separacionseccion2/Separacionseccio
 export default function Home() {
   return (
    <div>
-  
+  <title>Home</title>
     <Swipercarousel/>
     <Middleinfo/>
     <Separacionseccion/>
