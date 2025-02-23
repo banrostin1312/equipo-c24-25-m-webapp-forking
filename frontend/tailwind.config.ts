@@ -10,7 +10,8 @@ export default {
     extend: {
       backgroundImage: {
         'black-purple-gradient': 'linear-gradient(90deg, rgba(33,33,33,1) 0%, rgba(101,10,176,1) 100%)',
-        'black-green-gradient':'linear-gradient(90deg, rgba(33,33,33,1) 0%, rgba(17,158,31,1) 100%)'
+        'black-green-gradient':'linear-gradient(90deg, rgba(33,33,33,1) 0%, rgba(17,158,31,1) 100%)',
+        'white-green-gradient':'linear-gradient(90deg, rgba(132,213,121,1) 0%, rgba(26,119,23,1) 100%)',
       },
       colors: {
         background: "var(--background)",
