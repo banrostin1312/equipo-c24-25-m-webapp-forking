@@ -51,8 +51,8 @@ const Navbar: React.FC = () => {
                     </div>
 
                     <div className="flex mr-4">
-                        <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F]"><Link href="/">Homebanking</Link></button></li>
-                        <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F]"><Link href="/">Registrate</Link></button></li>
+                        <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300"><Link href="/">Homebanking</Link></button></li>
+                        <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300"><Link href="/">Registrate</Link></button></li>
                     </div>
 
                 </ul>
