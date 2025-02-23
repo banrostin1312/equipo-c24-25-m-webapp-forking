@@ -8,42 +8,42 @@ const Footer: React.FC = () => {
 
             <ul className="space-y-2 flex justify-start text-center md:text-left flex-col mx-5">
                 <li><h4 className="text-buttons-hover underline  decoration-buttons-hover text-[20px] text-center md:text-left">FUNCIONALIDADES</h4></li>
-                <li><p className="text-[14px]">Transferencias</p></li>
-                <li><p className="text-[14px]">Caja de Ahorro</p></li>
-                <li><p className="text-[14px]">Compras</p></li>
-                <li><p className="text-[14px]">Cobros</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Transferencias</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Caja de Ahorro</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Compras</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Cobros</p></li>
             </ul>
 
             <ul className="space-y-2 flex justify-start text-center md:text-left flex-col mx-5">
                 <li><h4 className="text-buttons-hover underline  decoration-buttons-hover text-[20px] text-center md:text-left md:whitespace-nowrap">SOBRE LUMA</h4></li>
-                <li><p className="text-[14px]">Nosotros</p></li>
-                <li><p className="text-[14px]">Prensa</p></li>
-                <li><p className="text-[14px]">Trabajá con nosotros</p></li>
-                <li><p className="text-[14px]">Postulaciones</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Nosotros</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Prensa</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Trabajá con nosotros</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Postulaciones</p></li>
             </ul>
 
             <ul className="space-y-2 flex justify-start text-center md:text-left flex-col mx-5">
                 <li><h4 className="text-buttons-hover underline  decoration-buttons-hover text-[20px] text-center md:text-left md:whitespace-nowrap">COSTOS Y LEGALES</h4></li>
-                <li><p className="text-[14px]">Costos</p></li>
-                <li><p className="text-[14px]">Politicas de privacidad</p></li>
-                <li><p className="text-[14px]">Información al usuario </p></li>
-                <li><p className="text-[14px]">Información general</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Costos</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Politicas de privacidad</p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Información al usuario </p></li>
+                <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Información general</p></li>
             </ul>
 
             <div className="flex flex-col space-y-4">
                 <ul className="space-y-2 flex justify-start text-center md:text-left flex-col mx-5">
                     <li><h4 className="text-buttons-hover underline  decoration-buttons-hover text-[20px] text-center md:text-left md:whitespace-nowrap">SOPORTE TÉCNICO</h4></li>
-                    <li><p className="text-[14px]">Preguntas frecuentes</p></li>
-                    <li><p className="text-[14px]">Consejos de seguridad</p></li>
+                    <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Preguntas frecuentes</p></li>
+                    <li><p className="text-[14px] hover:text-buttons-hover cursor-pointer">Consejos de seguridad</p></li>
 
                 </ul>
 
                 <ul className="space-y-2 flex justify-start text-center md:text-left flex-col mx-5">
                     <li><h4 className="text-buttons-hover underline  decoration-buttons-hover text-[20px] text-center md:text-left md:whitespace-nowrap">REDES SOCIALES </h4></li>
                     <div className="flex flex-row md:justify-center items-center justify-center space-x-4 ">
-                        <div className="bg-instagram-gradient rounded-[22.5px]"><img src="/insta-icon.svg" alt="instagram-icon" className="w-[17.5px] h-[20px]" /></div>
-                        <div className="bg-linkedin-bg rounded-[22.5px]"><img src="/linkedin-icon.svg" alt="instagram-icon" className="w-[17.5px] h-[20px]" /></div>
-                        <div className="bg-youtube-bg rounded-[22.5px]"><img src="/youtube-icon.svg" alt="instagram-icon" className="w-[17.5px] h-[20px]" /></div>
+                        <div className="bg-instagram-gradient rounded-full cursor-pointer hover:scale-110"><img src="/insta-icon.svg" alt="instagram-icon" className="w-[35px] h-[35px]" /></div>
+                        <div className="bg-linkedin-bg rounded-full cursor-pointer hover:scale-110"><img src="/linkedin-icon.svg" alt="linkedin-icon" className="w-[35px] h-[35px]" /></div>
+                        <div className="bg-youtube-bg rounded-full cursor-pointer hover:scale-110"><img src="/youtube-icon.svg" alt="youtube-icon" className="w-[35px] h-[35px]" /></div>
                     </div>
 
 
