@@ -1,7 +1,6 @@
 package com.back.banka.Config;
 
-import com.back.banka.Services.Impl.UserDetailsServiceImpl;
-import com.back.banka.Utils.JwtAuthorizationFilter;
+import com.back.banka.Utils.JwtAuthenticationFilter;
 import com.back.banka.Utils.JwtEntryPoint;
 import com.back.banka.Utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
@@ -31,8 +30,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthorizationFilter jwtAuthenticationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtil, userDetailsService);
     }
 
 
