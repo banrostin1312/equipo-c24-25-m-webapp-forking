@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
 
     return (
         <div>
-            <div className="grid justify-between items-center grid-cols-2 gap-5 md:flex-row md:flex mb-7">
+            <div className="grid justify-between items-center grid-cols-2 gap-5 md:flex-row md:flex mb-7 w-full md:max-w-[1381px] md:max-h-[323px]">
 
                 <ul className="space-y-2 flex justify-start text-center md:text-left flex-col mx-5">
                     <li><h4 className="text-buttons-hover underline  decoration-buttons-hover text-[20px] text-center md:text-left">FUNCIONALIDADES</h4></li>
@@ -52,7 +52,7 @@ const Footer: React.FC = () => {
                     </ul>
                 </div>
 
-                <ul className="space-y-2 flex justify-start md:text-left flex-col mx-5">
+                <ul className="space-y-2 flex justify-center items-center md:text-left flex-col mx-5">
                     <li><h4 className="text-buttons-hover underline  decoration-buttons-hover text-[20px] text-center md:whitespace-nowrap">DESCARGÁ LA APP</h4></li>
                     <li>
                         <button className="group bg-buttons-hover rounded-full w-[174px] h-[60px] text-white hover:bg-white hover:text-black flex items-center justify-center space-x-2 border-2 border-buttons-hover">

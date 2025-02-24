@@ -9,8 +9,8 @@ const Middleinfo: React.FC = () => {
   return (
 
     <div>
-      <section className=" md:space-y-20">
-        <div className="flex flex-col md:flex-row justify-center items-center space-x-4 md:space-x-32 ">
+      <section className=" md:space-y-20 mt-20 md:mt-[60px]">
+        <div className="flex flex-col md:flex-row justify-center items-center space-x-4 md:space-x-32 md:max-w-[1039px] md:max-h-[226px] mx-auto">
           <Image height={126} width={126} src="/persona3.png" alt="img1 middle" className="md:w-[226px] md:h-[226px]"></Image>
           <div className="flex flex-col justify-center items-center space-y-3 md:flex-row ">
             <div className="flex flex-col justify-center items-center space-y-3">
@@ -37,7 +37,7 @@ const Middleinfo: React.FC = () => {
 
         </div>
 
-        <div className="flex flex-col md:flex-row justify-center items-center space-x-4 md:space-x-32 mt-9">
+        <div className="flex flex-col md:flex-row justify-center items-center space-x-4 md:space-x-32 mt-9 md:max-w-[1039px] md:max-h-[226px] mx-auto">
           <Image height={126} width={126} src="/persona4.png" alt="img1 middle" className="md:w-[226px] md:h-[226px]"></Image>
           <div className="flex flex-col justify-center items-center space-y-3 md:flex-row ">
             <div className="flex flex-col justify-center items-center space-y-3">
