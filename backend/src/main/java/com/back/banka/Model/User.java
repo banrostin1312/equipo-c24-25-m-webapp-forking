@@ -3,6 +3,7 @@ import com.back.banka.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -48,11 +49,13 @@ import java.util.List;
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
         private List<Tokens> tokens;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<AccountBank> accountUser;
+        @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+        private List<AccountBank> accountUser;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Notifications> notifications;
+         @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+         private List<Notifications> notifications;
+
+         private LocalDate dateBirthDay;
 
 
     public String getEmail(){
