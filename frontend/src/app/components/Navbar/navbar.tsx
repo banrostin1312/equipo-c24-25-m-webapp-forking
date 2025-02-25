@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
                         <li className="flex justify-center items-center bg-nav-buttons p-3 m-3 rounded-lg w-full h-[40px]"><Link href="/">Turnos web</Link></li>
                         <li className="flex justify-center items-center bg-nav-buttons p-3 m-3 rounded-lg w-full h-[40px]"><Link href="/">Ayuda</Link></li>
                         <li className="flex justify-center items-center bg-nav-buttons p-3 m-3 rounded-lg w-full h-[40px]"><Link href="/">Homebanking</Link></li>
-                        <li className="flex justify-center items-center bg-nav-buttons p-3 m-3 rounded-lg w-full h-[40px] "><Link href="/">Registrate</Link></li>
+                        <li className="flex justify-center items-center bg-nav-buttons p-3 m-3 rounded-lg w-full h-[40px] "><Link href="/registro">Registrate</Link></li>
 
                     </ul>
                 </div>
@@ -52,7 +52,7 @@ const Navbar: React.FC = () => {
 
                     <div className="flex mr-4">
                         <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300"><Link href="/">Homebanking</Link></button></li>
-                        <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300"><Link href="/">Registrate</Link></button></li>
+                        <Link href="/registro" className=""><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300">Registrate</button></Link>
                     </div>
 
                 </ul>
