@@ -4,18 +4,25 @@ import com.back.banka.Enums.NotificationsType;
 import com.back.banka.Model.Notifications;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.INotificationRepository;
-import lombok.AllArgsConstructor;
+import com.back.banka.Services.IServices.INotificationService;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDateTime;
 
 @Service
-@AllArgsConstructor
-public class NotificationServiceImpl {
+@RequiredArgsConstructor
+public class NotificationServiceImpl implements INotificationService {
 
     private final INotificationRepository notificationRepository;
+    private final JavaMailSender mailSender;
 
-    public Notifications createNotification(String title, String body, User user, NotificationsType type) {
+    //Se crea y guarda la notificación DB
+    public Notifications createAndNotify(String title, String body, User user, NotificationsType type) {
         Notifications notification = Notifications.builder()
                 .title(title)
                 .body(body)
@@ -26,4 +33,20 @@ public class NotificationServiceImpl {
 
         return notificationRepository.save(notification);
     }
+
+    // Se envía correo con los datos de la notificación
+    private void sendEmailNotification(String to, String subject, String content) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(content, true);
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
