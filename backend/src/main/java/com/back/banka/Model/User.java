@@ -1,5 +1,5 @@
 package com.back.banka.Model;
-import com.back.banka.Enums.Rol;
+import com.back.banka.Enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,7 +38,7 @@ import java.util.List;
 
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)
-        private Rol role;
+        private Role role;
 
         @Column(nullable = false)
         private boolean status;
@@ -114,11 +114,11 @@ import java.util.List;
             this.country = country;
         }
 
-        public Rol getRole() {
+        public Role getRole() {
             return role;
         }
 
-        public void setRole(Rol role) {
+        public void setRole(Role role) {
             this.role = role;
         }
 
