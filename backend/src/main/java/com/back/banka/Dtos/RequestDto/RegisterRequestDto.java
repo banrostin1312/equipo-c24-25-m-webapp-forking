@@ -1,8 +1,5 @@
 package com.back.banka.Dtos.RequestDto;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,10 +20,17 @@ public class RegisterRequestDto {
     @Email(message = "Formato inválido")
     private String email;
     @NotBlank(message = "Campo obligatorio")
+    @Size(min = 8, max = 20, message = "La contraseña debe tener entre 8 y 20 caracteres")
+    @Pattern(
+            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            message = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
+    )
     private String password;
     @NotBlank(message = "Campo obligatorio")
     private String country;
     @NotBlank(message = "Campo obligatorio")
+    @Size(min = 8, max = 8, message = "El DNI debe tener exactamente 8 caracteres")
+    @Pattern(regexp = "\\d{8}", message = "El DNI debe contener solo números")
     private String DNI;
 
 }
