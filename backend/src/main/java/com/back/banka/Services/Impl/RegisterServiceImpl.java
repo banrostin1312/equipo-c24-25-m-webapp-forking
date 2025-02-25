@@ -7,25 +7,21 @@ import com.back.banka.Exceptions.Custom.UserAlreadyExistsException;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IRegisterService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
 
+@AllArgsConstructor
 @Service
 public class RegisterServiceImpl implements IRegisterService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailServiceImpl emailService;
-
-    @Autowired
-    public RegisterServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailServiceImpl emailService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
-    }
 
     @Transactional
     @Override
@@ -47,9 +43,14 @@ public class RegisterServiceImpl implements IRegisterService {
                     .build();
 
             User savedUser = userRepository.save(user);
-            emailService.sendEmail(user.getEmail(), "¡Registro exitoso!\n", "Bienvenido a Luma");
 
-            return RegisterResponseDto.builder()
+        Map<String, Object> emailVariables = new HashMap<>();
+        emailVariables.put("username", savedUser.getName());
+
+        emailService.sendEmail(savedUser.getEmail(), "¡Bienvenido a Luma!", "welcome-email", emailVariables);
+
+
+        return RegisterResponseDto.builder()
                     .message("¡Registro Exitoso!")
                     .userId(savedUser.getId())
                     .build();
