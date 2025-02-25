@@ -60,7 +60,7 @@ const Registrarse: React.FC = () => {
             <h3 className="text-4xl">Registrate</h3>
             <div className="flex flex-col items-center justify-center md:w-[457px] md:h-[570px] border-[1px] border-black">
 
-                <div className="flex justify-center items-center bg-middle-title md:w-[457px] w-[375px] md:max-w-[457px] h-[60px] "><img src="/LOGO-sinbanca.png" alt="Logo" className="w-[166px] h-[60px]" /></div>
+                <div className="flex justify-center items-center bg-middle-title md:w-[457px] w-[375px] md:max-w-[457px] h-[60px] "><img src="/LOGOsinbanca.png" alt="Logo" className="w-[166px] h-[60px]" /></div>
                 <form action="" className="flex flex-col justify-center items-center md:w-[343px] md:h-[500px] border-[1px] border-border-forms rounded-[20px] mt-2 mb-2" onSubmit={handleSubmit}>
                     <label htmlFor="">Nombre:</label>
                     <input  value={dataForm.name} onChange={handleChange} type="text" name="name" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
