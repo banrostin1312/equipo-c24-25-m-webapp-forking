@@ -28,14 +28,14 @@ public class BankTransaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "send_id")
-    private BankAccount accountSend;
+    private AccountBank accountSend;
 
    @JoinColumn(name = "receiving_id")
    @ManyToOne(fetch = FetchType.LAZY)
-   private BankAccount accountReceiving;
+   private AccountBank accountReceiving;
 
-   @Column(nullable = false)
-   private BigDecimal amount;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal amount;
 
    @Column(nullable = false)
    @Enumerated(EnumType.STRING)

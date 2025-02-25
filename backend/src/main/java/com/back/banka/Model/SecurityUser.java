@@ -1,8 +1,5 @@
 package com.back.banka.Model;
-
-
 import com.back.banka.Enums.Rol;
-import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

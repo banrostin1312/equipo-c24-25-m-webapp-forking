@@ -1,7 +1,9 @@
 package com.back.banka.Services.Impl;
 
 import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
+import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
 import com.back.banka.Enums.Rol;
+import com.back.banka.Exceptions.Custom.UserAlreadyExistsException;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IRegisterService;
@@ -29,26 +31,30 @@ public class RegisterServiceImpl implements IRegisterService {
     @Transactional
     @Override
     //Registra un usuario solo si el correo aún no está registrado.
-    public String registerUser(RegisterRequestDto request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            return "Correo ya registrado. Intenta iniciar sesión o ingresa un correo distinto.";
-        } else {
-            User user = new User();
-            user.setName(request.getName());
-            user.setAge(request.getAge());
-            user.setEmail(request.getEmail());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setCountry(request.getCountry());
-            user.setDNI(request.getDNI());
-            user.setRole(Rol.CLIENTE);
+    public RegisterResponseDto registerUser(RegisterRequestDto request) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new UserAlreadyExistsException("Correo ya registrado. Intenta iniciar sesión o ingresa un correo distinto.");
+            }
 
-            userRepository.save(user);
-            emailService.sendEmail(user.getEmail(), "¡Registro exitoso!/n", "Bienvenido a Luma");
-            return "¡Registro Exitoso!";
-        }
+            User user = User.builder()
+                    .name(request.getName())
+                    .age(request.getAge())
+                    .email(request.getEmail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .country(request.getCountry())
+                    .DNI(request.getDNI())
+                    .status(true)
+                    .role(Rol.CLIENTE)
+                    .build();
+
+            User savedUser = userRepository.save(user);
+            emailService.sendEmail(user.getEmail(), "¡Registro exitoso!\n", "Bienvenido a Luma");
+
+            return RegisterResponseDto.builder()
+                    .message("¡Registro Exitoso!")
+                    .userId(savedUser.getId())
+                    .build();
+
+
     }
-
-
 }
-
-

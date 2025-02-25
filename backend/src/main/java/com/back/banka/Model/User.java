@@ -1,5 +1,4 @@
 package com.back.banka.Model;
-
 import com.back.banka.Enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,14 +7,13 @@ import java.util.List;
 
 
 @Entity
-    @Table(name = "usuarios")
+    @Table(name = "users")
     @Getter
     @Setter
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-
     public class User {
 
         @Id
@@ -47,13 +45,17 @@ import java.util.List;
         @Column(nullable = false)
         private String DNI;
 
-        @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
-        private List<BankAccount> accountUser;
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+        private List<Tokens> tokens;
 
-        @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
-        private List<Notifications> notifications;
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<AccountBank> accountUser;
 
-        public String getEmail(){
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Notifications> notifications;
+
+
+    public String getEmail(){
             return email;
         }
 
