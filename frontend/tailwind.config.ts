@@ -23,7 +23,9 @@ export default {
         "buttons-hover": "#10A51F",
         "middle-title": "#1A7717",
         "linkedin-bg" : "#0274B3",
-        "youtube-bg" : "#FF0000"
+        "youtube-bg" : "#FF0000",
+        "input-border":"#3D6697",
+        "border-forms":"#C4C4C4"
       },
     },
   },

@@ -76,7 +76,7 @@ const Footer: React.FC = () => {
                     </li>
 
                     <li>
-                        <button className="group bg-buttons-hover rounded-full w-[174px] h-[60px] text-white hover:bg-white hover:text-black flex items-center justify-center space-x-2 border-2 border-buttons-hover">
+                        <button className="group bg-buttons-hover rounded-full w-[174px] h-[60px] text-white hover:bg-white hover:text-black flex items-center justify-center space-x-2 border-2 ">
                             {/* SVG normal */}
                             <img
                                 src="/googleplay-icon.svg"
