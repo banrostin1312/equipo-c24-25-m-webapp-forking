@@ -11,10 +11,10 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 public class ActiveAccountRequestDto {
-    @NotNull(message = "no puede ser nulo ")
+    @NotNull(message = "Documento no puede ser nulo ")
     private String document;
-    @NotNull(message = "no puede ser nulo ")
+    @NotNull(message = "Su fecha de nacimiento no puede estar vacia ")
     private LocalDate birthDate;
-    @NotNull(message = "no puede ser nulo ")
+    @NotNull(message = " La frase de seguridad  es obligatoria")
     private String securityPhrase;
 }

@@ -34,7 +34,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
         User user = this.userRepository.findByDNI(requestDto.getDocument()).orElseThrow(()
                 -> new BadRequestExceptions(" usuario con documento" + requestDto.getDocument()+ " no existe"));
 
-       AccountBank create =  createBankAccount(user);
+       AccountBank create =  createBankAccount(user,requestDto);
         AccountBank savedAccount = this.accountBankRepository.save(create);
 
         return buildAccountResponseDto(savedAccount);
@@ -55,12 +55,13 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     }
 
-    private AccountBank createBankAccount(User user){
+    private AccountBank createBankAccount(User user, ActiveAccountRequestDto requestDto){
 
         return AccountBank.builder()
                 .accountStatus(AccountStatus.ACTIVE)
                 .balance(BigDecimal.ZERO)
                 .type(AccountType.SAVINGS_ACCOUNT)
+                .permissionPhrase(requestDto.getSecurityPhrase())
                 .number(generateAccountNumber())
                 .user(user)
                 .build();
@@ -98,6 +99,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     @Override
     public ActiveAccountResponseDto deactivateAccount(Integer accountNumber) {
+
         return null;
     }
 
