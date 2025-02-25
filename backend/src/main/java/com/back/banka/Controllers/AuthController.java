@@ -61,7 +61,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping("/registrarse")
-    public ResponseEntity<RegisterResponseDto> register(@RequestBody RegisterRequestDto request){
+    public ResponseEntity<RegisterResponseDto> register(@Valid @RequestBody RegisterRequestDto request){
         RegisterResponseDto response = registerService.registerUser(request);
         return ResponseEntity.ok(response);
     }

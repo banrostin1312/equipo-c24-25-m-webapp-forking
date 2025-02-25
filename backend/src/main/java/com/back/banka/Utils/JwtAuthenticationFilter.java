@@ -1,6 +1,8 @@
 package com.back.banka.Utils;
 
 import com.back.banka.Model.User;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,36 +37,60 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring(7);
-        String username = jwtUtil.extractEmail(token);
+        try {
+            final String token = authHeader.substring(7);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-
-            if (jwtUtil.isTokenValid(token, (User) userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
-
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            // Validar el token primero
+            if (!jwtUtil.validateToken(token)) {
+                logger.warn("Token inválido");
+                filterChain.doFilter(request, response);
+                return;
             }
+
+            final String username = jwtUtil.extractEmail(token);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                if (jwtUtil.isTokenValid(token, (User) userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            logger.error("Token expirado: {}", e.getMessage());
+            handleAuthenticationException(response, "Token expirado");
+        } catch (JwtException e) {
+            logger.error("Error de JWT: {}", e.getMessage());
+            handleAuthenticationException(response, "Error de token: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error inesperado durante la autenticación: {}", e.getMessage());
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
+    }
 
-
+    private void handleAuthenticationException(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write(String.format(
+                "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"%s\",\"path\":\"\"}",
+                java.time.LocalDateTime.now(), message));
     }
 
 }

@@ -2,12 +2,11 @@ package com.back.banka.Services.Impl;
 
 import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
 import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
-import com.back.banka.Enums.Rol;
+import com.back.banka.Enums.Role;
 import com.back.banka.Exceptions.Custom.UserAlreadyExistsException;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IRegisterService;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,7 +43,7 @@ public class RegisterServiceImpl implements IRegisterService {
                     .country(request.getCountry())
                     .DNI(request.getDNI())
                     .status(true)
-                    .role(Rol.CLIENTE)
+                    .role(Role.CLIENT)
                     .build();
 
             User savedUser = userRepository.save(user);

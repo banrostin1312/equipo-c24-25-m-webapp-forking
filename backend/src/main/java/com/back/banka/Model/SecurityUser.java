@@ -1,5 +1,5 @@
 package com.back.banka.Model;
-import com.back.banka.Enums.Rol;
+import com.back.banka.Enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,7 +20,7 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(Arrays.toString(Rol.values())));
+        return Collections.singleton(new SimpleGrantedAuthority(Arrays.toString(Role.values())));
     }
 
     @Override
