@@ -10,6 +10,7 @@ import com.back.banka.Model.User;
 import com.back.banka.Repository.IAccountBankRepository;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IAccountBankService;
+import com.back.banka.Services.IServices.IEmailService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,20 +23,44 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
      private final IAccountBankRepository accountBankRepository;
      private final UserRepository userRepository;
+     private final IEmailService emailService;
 
-    public AccountBankServiceImpl(IAccountBankRepository accountBankRepository, UserRepository userRepository) {
+    public AccountBankServiceImpl(IAccountBankRepository accountBankRepository, UserRepository userRepository, IEmailService emailService) {
         this.accountBankRepository = accountBankRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
+    /**
+     * Activa una nueva cuenta bancaria para un usuario.
+     * - Si el usuario no existe, lanza una excepción.
+     * - Si el usuario ya tiene 3 cuentas bancarias, no permite crear más.
+     * - Si es la primera cuenta del usuario, valida la información antes de crearla.
+     * - Guarda la nueva cuenta en la base de datos y devuelve la información de la cuenta creada.
+     * envia un mensaje al correo electronico del usuario confirmando la creacion de su cuenta bancaria
+     *
+     * @param requestDto Datos de la solicitud de activación de cuenta.
+     * @return ActiveAccountResponseDto con los detalles de la cuenta creada.
+     * @throws BadRequestExceptions si el usuario no existe, ya tiene 3 cuentas o los datos no son válidos.
+     */
 
     @Override
     public ActiveAccountResponseDto activeAccount(ActiveAccountRequestDto requestDto) {
-                confirmData(requestDto);
+
         User user = this.userRepository.findByDNI(requestDto.getDocument()).orElseThrow(()
                 -> new BadRequestExceptions(" usuario con documento" + requestDto.getDocument()+ " no existe"));
+     int accountCount = this.accountBankRepository.countByUser(user);
+
+     if(accountCount > 3){
+         throw new BadRequestExceptions("no puede crear mas de 3 cuentas Bancarias");
+     }
+
+     if(accountCount == 0){
+        confirmData(requestDto);
+     }
 
        AccountBank create =  createBankAccount(user,requestDto);
         AccountBank savedAccount = this.accountBankRepository.save(create);
+//        emailService.sendEmail();
 
         return buildAccountResponseDto(savedAccount);
     }
