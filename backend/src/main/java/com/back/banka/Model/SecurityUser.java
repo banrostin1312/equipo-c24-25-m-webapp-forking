@@ -24,7 +24,7 @@ public class SecurityUser implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         logger.info("usuario cargado" + user.getEmail());
-        return Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()));
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override

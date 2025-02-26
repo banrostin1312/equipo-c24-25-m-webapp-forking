@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Function;
 
 @Service
 public class JwtUtil {
@@ -125,5 +127,11 @@ public class JwtUtil {
         return this.key;
     }
 
-
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = getClaims(token);
+        return claimsResolver.apply(claims);
+    }
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> claims.get("authorities", List.class));
+    }
 }

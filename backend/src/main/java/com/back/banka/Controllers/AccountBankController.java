@@ -14,12 +14,14 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @SecurityRequirement(name = "bearerAuth")
 @RestController
+@PreAuthorize("hasRole('CLIENT')")
 @RequestMapping("/api/banca/cuenta-bancaria")
 public class AccountBankController {
 
@@ -30,7 +32,7 @@ public class AccountBankController {
         this.accountBankService = accountBankService;
     }
     @Operation(summary = "Activar cuenta bancaria",
-            description = "Permite activar una cuenta bancaria para un usuario registrado. "
+            description = "Permite activar una cuenta bancaria para un usuario registrado y con rol CLIENT. "
                     + "Si el usuario activa su primera cuenta, se validan datos como documento, fecha de nacimiento y frase de seguridad. "
                     + "Si el usuario ya tiene una cuenta y desea abrir otra, solo se crea sin necesidad de validar nuevamente.")
     @ApiResponses(value = {
