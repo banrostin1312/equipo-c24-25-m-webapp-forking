@@ -1,9 +1,7 @@
 package com.back.banka.Services.Impl;
 
 import com.back.banka.Dtos.RequestDto.NotificationRequestDto;
-import com.back.banka.Enums.NotificationsType;
 import com.back.banka.Model.Notifications;
-import com.back.banka.Model.User;
 import com.back.banka.Repository.INotificationRepository;
 import com.back.banka.Services.IServices.INotificationService;
 import jakarta.mail.internet.MimeMessage;
@@ -33,7 +31,9 @@ public class NotificationServiceImpl implements INotificationService {
                 .type(request.getType())
                 .build();
 
-        return notificationRepository.save(notification);
+        notificationRepository.save(notification);
+        sendEmailNotification(request.getUser().getEmail(), request.getTitle(), request.getBody());
+        return notification;
     }
 
     // Se envía correo con los datos de la notificación
