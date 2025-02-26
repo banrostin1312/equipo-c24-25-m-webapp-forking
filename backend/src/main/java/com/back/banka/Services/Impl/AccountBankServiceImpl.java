@@ -107,4 +107,20 @@ public class AccountBankServiceImpl implements IAccountBankService {
     public ActiveAccountResponseDto getBalance(Long accountId) {
         return null;
     }
+
+    @Override
+    public ActiveAccountResponseDto getBalanceByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestExceptions("Usuario no encontrado"));
+
+        AccountBank account = accountBankRepository.findByUser(user)
+                .orElseThrow(() -> new BadRequestExceptions("Cuenta bancaria no encontrada"));
+
+        if (account.getAccountStatus() == AccountStatus.INACTIVE) {
+            throw new BadRequestExceptions("Cuenta inactiva. No es posible realizar consultas.");
+        }
+
+        return buildAccountResponseDto(account);
+    }
+
 }

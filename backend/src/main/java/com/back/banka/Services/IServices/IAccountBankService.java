@@ -8,6 +8,5 @@ public interface IAccountBankService {
     ActiveAccountResponseDto activeAccount(ActiveAccountRequestDto requestDto);
     ActiveAccountResponseDto deactivateAccount(Integer accountNumber);
     ActiveAccountResponseDto getBalance(Long accountId);
-
-
+    ActiveAccountResponseDto getBalanceByEmail(String email);
 }

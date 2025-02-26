@@ -1,5 +1,6 @@
 package com.back.banka.Services.Impl;
 
+import com.back.banka.Dtos.RequestDto.NotificationRequestDto;
 import com.back.banka.Enums.NotificationsType;
 import com.back.banka.Model.Notifications;
 import com.back.banka.Model.User;
@@ -21,14 +22,15 @@ public class NotificationServiceImpl implements INotificationService {
     private final INotificationRepository notificationRepository;
     private final JavaMailSender mailSender;
 
+    @Override
     //Se crea y guarda la notificación DB
-    public Notifications createAndNotify(String title, String body, User user, NotificationsType type) {
+    public Notifications createAndNotify(NotificationRequestDto request) {
         Notifications notification = Notifications.builder()
-                .title(title)
-                .body(body)
+                .title(request.getTitle())
+                .body(request.getBody())
                 .date(LocalDateTime.now())
-                .user(user)
-                .type(type)
+                .user(request.getUser())
+                .type(request.getType())
                 .build();
 
         return notificationRepository.save(notification);
