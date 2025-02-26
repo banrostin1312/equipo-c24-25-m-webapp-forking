@@ -1,7 +1,10 @@
 package com.back.banka.Services.IServices;
 
 import com.back.banka.Dtos.RequestDto.LoginRequestDto;
+import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
 import com.back.banka.Dtos.ResponseDto.TokenResponseDto;
+
+import java.util.List;
 
 public interface IUserService {
 
@@ -13,6 +16,7 @@ public interface IUserService {
      * */
     TokenResponseDto authenticate(LoginRequestDto loginRequestDto);
     TokenResponseDto refreshToken(String authHeader);
+    List<GetAllUsersResponseDto> getAllUsers();
 
 
 

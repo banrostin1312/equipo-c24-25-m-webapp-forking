@@ -1,7 +1,4 @@
 package com.back.banka.Dtos.ResponseDto;
-
-import com.back.banka.Enums.AccountStatus;
-import com.back.banka.Enums.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,5 +15,6 @@ public class ActiveAccountResponseDto {
     private String accountType;
     private String accountStatus;
     private BigDecimal balance;
+    private String dateOfActivation;
 
 }

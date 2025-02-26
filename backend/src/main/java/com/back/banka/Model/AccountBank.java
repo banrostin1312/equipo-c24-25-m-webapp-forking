@@ -5,6 +5,7 @@ import com.back.banka.Enums.AccountType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -43,8 +44,10 @@ public class AccountBank {
 
         @Enumerated(EnumType.STRING)
         private AccountStatus accountStatus;
-
         private String permissionPhrase;
+        private LocalDate dateOfActivation;
+        private LocalDate dateOfDeactivation;
+        private LocalDate dateOfReactivation;
 
 
 }
