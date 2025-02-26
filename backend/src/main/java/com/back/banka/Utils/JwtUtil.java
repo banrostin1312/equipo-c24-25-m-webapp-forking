@@ -4,15 +4,11 @@ import com.back.banka.Model.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
@@ -77,13 +73,13 @@ public class JwtUtil {
         return generateToken(email, expirationTime);
     }
 
-    public boolean isTokenValid(String token, User user) {
+    public boolean isTokenValid(String token, UserDetails user) {
         final String username = extractEmail(token);
         if (username == null) {
             logger.warn("No se pudo extraer el email del token.");
             return false;
         }
-        return (username.equals(user.getEmail()) && !isTokenExpired(token));
+        return (username.equals(user.getUsername()) && !isTokenExpired(token));
     }
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
