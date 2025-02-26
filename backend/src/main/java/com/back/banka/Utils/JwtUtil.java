@@ -7,10 +7,12 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Function;
 
 @Service
 public class JwtUtil {
@@ -73,13 +75,13 @@ public class JwtUtil {
         return generateToken(email, expirationTime);
     }
 
-    public boolean isTokenValid(String token, User user) {
+    public boolean isTokenValid(String token, UserDetails user) {
         final String username = extractEmail(token);
         if (username == null) {
             logger.warn("No se pudo extraer el email del token.");
             return false;
         }
-        return (username.equals(user.getEmail()) && !isTokenExpired(token));
+        return (username.equals(user.getUsername()) && !isTokenExpired(token));
     }
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
@@ -125,5 +127,11 @@ public class JwtUtil {
         return this.key;
     }
 
-
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = getClaims(token);
+        return claimsResolver.apply(claims);
+    }
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> claims.get("authorities", List.class));
+    }
 }
