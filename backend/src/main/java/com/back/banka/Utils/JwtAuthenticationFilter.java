@@ -36,18 +36,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+        logger.info("filtro de autenticacion ejecutandose ");
 
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.error("no se encuentra un token");
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
             final String token = authHeader.substring(7);
-
-            // Validar el token primero
+           logger.info("token extraido {}",token);
             if (!jwtUtil.validateToken(token)) {
                 logger.warn("Token inválido");
                 filterChain.doFilter(request, response);
@@ -55,11 +56,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             final String username = jwtUtil.extractEmail(token);
-
+        logger.info("usuario extraido {}",username);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtUtil.isTokenValid(token, (User) userDetails)) {
+                if (jwtUtil.isTokenValid(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                     );

@@ -43,7 +43,7 @@ import java.util.List;
         @Column(nullable = false)
         private boolean status;
 
-        @Column(nullable = false)
+        @Column(nullable = false,unique = true)
         private String DNI;
 
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
