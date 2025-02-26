@@ -22,7 +22,7 @@ public class EmailServiceImpl implements IEmailService {
     private  final JavaMailSender javaMailSender;
     private final TemplateEngine templateEngine;
 
-    @Value("${mail.username:NOT_FOUND}")
+    @Value("${mail.username}")
     private String mailUsername;
 
     @Override
