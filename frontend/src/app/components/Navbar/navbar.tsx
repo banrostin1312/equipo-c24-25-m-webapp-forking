@@ -72,7 +72,8 @@ const Navbar: React.FC = () => {
       </nav>
 
             {/* DESKTOP NAVBAR*/}
-            <nav className="hidden md:block max-w-[1381px] max-h-[105px]">
+            <div className='flex justify-center items-center'>
+            <nav className="hidden md:block max-w-[1200px] max-h-[105px]">
                 <ul className="flex justify-between items-center w-full">
                     <li> <Link href="/"><Image height={189} width={130} src="/LOGO.png" alt="Logo" className="ml-4"></Image></Link></li>
                     <div className="flex space-x-1 ml-32">
@@ -89,6 +90,7 @@ const Navbar: React.FC = () => {
 
                 </ul>
             </nav>
+            </div>
 
         </div>
     )
