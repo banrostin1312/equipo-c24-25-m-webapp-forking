@@ -52,6 +52,7 @@ public class RegisterServiceImpl implements IRegisterService {
         } catch (Exception e) {
             System.out.println("Error al enviar el correo: " + e.getMessage());
         }
+
         return RegisterResponseDto.builder()
                 .message("¡Registro Exitoso!")
                 .userId(savedUser.getId())

@@ -16,5 +16,4 @@ public interface IAccountBankService {
     ReactivateAccountResponseDto reactiveAccount(Long accountId);
     ActiveAccountResponseDto getBalance(Long accountId);
 
-
 }

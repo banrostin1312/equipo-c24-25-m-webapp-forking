@@ -12,11 +12,6 @@ public class NotificationController {
 
     @PostMapping
     public Notifications createNotification(@RequestBody NotificationRequestDto request){
-        return notificationService.createAndNotify(
-                request.getTitle(),
-                request.getBody(),
-                request.getUser(),
-                request.getType()
-        );
+        return notificationService.createAndNotify(request);
     }
 }
