@@ -2,7 +2,8 @@
 
 const Separacionseccion: React.FC = () => {
     return (
-        <div className="mt-8 max-w-[1381px] max-h-[100px]">
+       <div className="flex items-center justify-center">
+         <div className="mt-8 max-w-[1200px] max-h-[100px] w-full">
             <div className="bg-black-green-gradient h-[190px] flex flex-col justify-center items-center md:flex-row space-y-2 md:space-y-0 md:space-x-32">
                 <p className="text-white font-sans md:text-[16px]">conoce todo lo que tenemos para brindarte</p>
                 <hr className="w-full border-green-hover border-2 md:hidden" />
@@ -27,6 +28,7 @@ const Separacionseccion: React.FC = () => {
                 
             </div>
         </div>
+       </div>
     )
 }
 

@@ -3,6 +3,7 @@ package com.back.banka.Controllers;
 
 import com.back.banka.Dtos.RequestDto.LoginRequestDto;
 import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
+import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
 import com.back.banka.Dtos.ResponseDto.TokenResponseDto;
 import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
 import com.back.banka.Services.IServices.IRegisterService;
@@ -19,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -61,7 +64,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping("/registrarse")
-    public ResponseEntity<RegisterResponseDto> register(@RequestBody RegisterRequestDto request){
+    public ResponseEntity<RegisterResponseDto> register(@Valid @RequestBody RegisterRequestDto request){
         RegisterResponseDto response = registerService.registerUser(request);
         return ResponseEntity.ok(response);
     }
@@ -84,4 +87,17 @@ public class AuthController {
     }
 
 
+    @Operation(summary = "Obtener todos los usuarios de la base de datos" +
+            "", description = "este endpoint permite obtener todos los usuarios registrados en la base de datos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "datos obtenidos con exito"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/usuarios")
+     public ResponseEntity<List<GetAllUsersResponseDto>> getAllUsers(){
+        List<GetAllUsersResponseDto> getAllUser = this.userService.getAllUsers();
+        logger.info("Datos recuperadoso: ");
+        return ResponseEntity.status(HttpStatus.OK).body(getAllUser);
+
+     }
 }

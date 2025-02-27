@@ -71,52 +71,29 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      {/* DESKTOP NAVBAR*/}
-      <nav className="hidden md:block max-w-[1381px] max-h-[105px]">
-        <ul className="flex justify-between items-center w-full">
-          <li>
-            {' '}
-            <Link href="/">
-              <Image
-                height={189}
-                width={130}
-                src="/LOGO.png"
-                alt="Logo"
-                className="ml-4"
-              ></Image>
-            </Link>
-          </li>
-          <div className="flex space-x-1 ml-32">
-            <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover ">
-              <Link href="/">Empresas</Link>
-            </li>
-            <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover">
-              <Link href="/">Personas</Link>
-            </li>
-            <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover">
-              <Link href="/">Turnos web</Link>
-            </li>
-            <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover">
-              <Link href="/">Ayuda</Link>
-            </li>
-          </div>
+            {/* DESKTOP NAVBAR*/}
+            <div className='flex justify-center items-center'>
+            <nav className="hidden md:block max-w-[1200px] max-h-[105px]">
+                <ul className="flex justify-between items-center w-full">
+                    <li> <Link href="/"><Image height={189} width={130} src="/LOGO.png" alt="Logo" className="ml-4"></Image></Link></li>
+                    <div className="flex space-x-1 ml-32">
+                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover "><Link href="/">Empresas</Link></li>
+                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/">Personas</Link></li>
+                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/">Turnos web</Link></li>
+                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/">Ayuda</Link></li>
+                    </div>
 
-          <div className="flex mr-4">
-            <li>
-              <button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300">
-                <Link href="/iniciarSesion">Homebanking</Link>
-              </button>
-            </li>
-            <Link href="/registro" className="">
-              <button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300">
-                Registrate
-              </button>
-            </Link>
-          </div>
-        </ul>
-      </nav>
-    </div>
-  )
+                    <div className="flex mr-4">
+                        <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300"><Link href="/">Homebanking</Link></button></li>
+                        <Link href="/registro" className=""><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300">Registrate</button></Link>
+                    </div>
+
+                </ul>
+            </nav>
+            </div>
+
+        </div>
+    )
 }
 
 export default Navbar

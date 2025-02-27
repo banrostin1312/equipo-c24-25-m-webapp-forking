@@ -67,12 +67,14 @@ public class SecurityConfig {
         http   .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( auth ->
+
                         auth.requestMatchers("/api/banca/auth/**",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
                                         "/v2/api-docs",
                                         "/v3/api-docs",
                                         "/v3/api-docs/swagger-config").permitAll()
+                                .requestMatchers("/api/banca/cuenta-bancaria/**").hasRole("CLIENT")
                         .anyRequest().authenticated())
 
                 .exceptionHandling(exception ->

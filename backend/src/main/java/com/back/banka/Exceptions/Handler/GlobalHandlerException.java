@@ -1,11 +1,9 @@
 package com.back.banka.Exceptions.Handler;
 
 
-import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
-import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
-import com.back.banka.Exceptions.Custom.UserAlreadyExistsException;
-import com.back.banka.Exceptions.Custom.UserNotFoundException;
+import com.back.banka.Exceptions.Custom.*;
 import com.back.banka.Exceptions.Dtos.ErrorResponseDto;
+import com.back.banka.Exceptions.Dtos.ErrorsResponse;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -13,15 +11,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@Builder
-@Getter
+
+@RestControllerAdvice
 public class GlobalHandlerException {
 
     //lanzadores
@@ -70,18 +70,36 @@ public class GlobalHandlerException {
 
         return new ResponseEntity<>(errorResponseDto, HttpStatus.FORBIDDEN);
     }
+    @ExceptionHandler(BadRequestExceptions.class)
+    public ResponseEntity<ErrorResponseDto> handleBanRequestException(BadRequestExceptions ex) {
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .message(ex.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
 
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorsResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
+
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+
+        ErrorsResponse errorResponse = new ErrorsResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation Error",
+                errors
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException ex) {
@@ -89,6 +107,8 @@ public class GlobalHandlerException {
         errorResponse.put("error", ex.getReason());
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
+
+
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {

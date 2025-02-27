@@ -5,8 +5,8 @@ import Link from "next/link"
 const Footer: React.FC = () => {
 
     return (
-        <div>
-            <div className="grid justify-between items-center grid-cols-2 gap-5 md:flex-row md:flex mb-7 w-full md:max-w-[1381px] md:max-h-[323px]">
+        <div className="grid justify-items-center items-center">
+            <div className="grid justify-between grid-cols-2 gap-5 md:flex-row md:flex mb-7 w-full md:max-w-[1381px] md:max-h-[323px]">
 
                 <ul className="space-y-2 flex justify-start text-center md:text-left flex-col mx-5">
                     <li><h4 className="text-buttons-hover underline  decoration-buttons-hover text-[20px] text-center md:text-left">FUNCIONALIDADES</h4></li>
