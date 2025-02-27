@@ -74,9 +74,8 @@ public class BankTransactionServiceImpl {
         );
 
         emailService.sendEmail(receiver.getUser().getEmail(),
-                "Recibiste una transferencia",
-                "transferencia-template ",//Debemos tener plantilla llamada "tranferencia-template"
-        variables);
+                "Haz recibido una transferencia",
+                "Has recibido " + requestDto.getAmount() + " de la cuenta " + sender.getNumber());
 
         return ResponseEntity.ok("Transferencia exitosa.");
         }
@@ -111,17 +110,11 @@ public class BankTransactionServiceImpl {
 
         transactionRepository.save(transaction);
 
-        Map<String, Object> variables = Map.of(
-                "amount", requestDto.getAmount(),
-                "receiverAccount", receiver.getNumber()
-
-        );
 
         emailService.sendEmail(receiver.getUser().getEmail(),
                 "Has recibido un depósito",
-                "deposit-template", //Debemos tener plantilla llamada "deposit-template"
-                variables
-        );
+                "Has recibido " + requestDto.getAmount() + " en tu cuenta " + receiver.getNumber());
+//
 
         return ResponseEntity.ok("Depósito exitoso");
         }
