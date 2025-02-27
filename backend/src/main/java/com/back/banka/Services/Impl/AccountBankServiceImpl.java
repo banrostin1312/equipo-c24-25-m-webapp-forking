@@ -26,7 +26,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -334,12 +336,23 @@ public class AccountBankServiceImpl implements IAccountBankService {
         }
     }
 
+
+
     private void sendNotificationEmail(User user, String subject, String message) {
+
         String body = "<h1>Banco XYZ</h1>"
+
+
                 + "<p>Hola, " + user.getName() + ".</p>"
+
+
                 + "<p>" + message + "</p>"
+
+
                 + "<p>Gracias por confiar en nosotros.</p>";
 
         emailService.sendEmail(user.getEmail(), subject, body);
+
     }
 }
+
