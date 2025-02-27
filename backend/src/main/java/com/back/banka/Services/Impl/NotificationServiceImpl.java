@@ -23,6 +23,10 @@ public class NotificationServiceImpl implements INotificationService {
     @Override
     //Se crea y guarda la notificación DB
     public Notifications createAndNotify(NotificationRequestDto request) {
+        if (request.getTitle() == null || request.getBody() == null) {
+            throw new RuntimeException("El título y el cuerpo no pueden estar vacíos");
+        }
+
         Notifications notification = Notifications.builder()
                 .title(request.getTitle())
                 .body(request.getBody())
@@ -31,12 +35,19 @@ public class NotificationServiceImpl implements INotificationService {
                 .type(request.getType())
                 .build();
 
-        notificationRepository.save(notification);
-        sendEmailNotification(request.getUser().getEmail(), request.getTitle(), request.getBody());
-        return notification;
+        Notifications savedNotification = notificationRepository.save(notification);
+
+        if (request.getUser() != null && request.getUser().getEmail() != null) {
+            sendEmailNotification(
+                    request.getUser().getEmail(),
+                    request.getTitle(),
+                    request.getBody()
+            );
+        }
+
+        return savedNotification;
     }
 
-    // Se envía correo con los datos de la notificación
     private void sendEmailNotification(String to, String subject, String content) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -44,10 +55,9 @@ public class NotificationServiceImpl implements INotificationService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(content, true);
-
             mailSender.send(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error al enviar correo: " + e.getMessage());
         }
     }
 

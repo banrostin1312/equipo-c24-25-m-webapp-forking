@@ -15,5 +15,5 @@ public interface IAccountBankService {
     List<GetAllAccountDto> getAllAccounts();
     ReactivateAccountResponseDto reactiveAccount(Long accountId);
     ActiveAccountResponseDto getBalance(Long accountId);
-    ActiveAccountResponseDto getBalanceByEmail(String email);
+
 }
