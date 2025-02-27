@@ -3,7 +3,8 @@
 
 const Separacionseccion2: React.FC = () => {
     return (
-        <div className="flex flex-col justify-center items-center bg-white-green-gradient md:max-w-[1382px] md:max-h-[213px] w-full md:space-y-16 space-y-5 mb-28 h-auto">
+       <div className="flex justify-center items-center ]">
+         <div className="flex flex-col justify-center items-center bg-white-green-gradient md:max-w-[1200px] md:max-h-[213px] w-full md:space-y-16 space-y-5 mb-28 h-auto">
             <h3 className="md:text-[40px] text-xl  text-white text-center mt-4">Todas tus finanzas desde un mismo lugar</h3>
             <div className="flex flex-col md:flex-row justify-center items-center w-full">
                 <div className="flex flex-col justify-center items-center space-y-6 md:flex-row md:space-y-0 mb-[34px] md:space-x-4 w-full h-full">
@@ -40,6 +41,7 @@ const Separacionseccion2: React.FC = () => {
                 </div>
             </div>
         </div>
+       </div>
     )
 }
 
