@@ -45,4 +45,5 @@ public class EmailServiceImpl implements IEmailService {
             throw new RuntimeException("Hubo un error al enviar el correo", e);
         }
     }
+
 }

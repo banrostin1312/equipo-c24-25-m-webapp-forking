@@ -1,15 +1,12 @@
 package com.back.banka.Controllers;
 
-import com.back.banka.Model.BankTransaction;
+import com.back.banka.Dtos.RequestDto.TransactionHistoryRequestDto;
+import com.back.banka.Dtos.RequestDto.TransactionRequestDto;
 import com.back.banka.Services.Impl.BankTransactionServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/transactions")
@@ -18,15 +15,23 @@ public class BankTransactionController {
 
     private final BankTransactionServiceImpl transactionService;
 
-    @PostMapping("/transfer")
-    public ResponseEntity<BankTransaction> transferMoney(@RequestParam Long senderId,
-                                                         @RequestParam Long receiverId,
-                                                         @RequestParam BigDecimal amount){
-        BankTransaction transaction = transactionService.transferMoney(senderId,receiverId,amount);
-        return ResponseEntity.ok(transaction);
+    @PostMapping("/sendmoney")
+    public ResponseEntity<String> sendMoney(@RequestBody TransactionRequestDto requestDto){
+    return transactionService.sendMoney(requestDto);
     }
 
+    @PostMapping("/receivemoney")
+    public ResponseEntity<String> receiveMoney(@RequestBody TransactionRequestDto requestDto){
+        return transactionService.receiveMoney(requestDto);
+    }
+
+    @GetMapping("/transaction-history")
+    public ResponseEntity<?> getTransactionHistory(@RequestBody TransactionHistoryRequestDto requestDto){
+        return  transactionService.getTransactionHistory(requestDto);
+    }
 }
+
+
 
 
 
