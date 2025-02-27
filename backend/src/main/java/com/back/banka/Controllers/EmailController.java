@@ -18,8 +18,7 @@ public class EmailController {
         emailService.sendEmail(
                 emailRequest.getTo(),
                 emailRequest.getSubject(),
-                emailRequest.getTemplateName(),
-                emailRequest.getVariables()
+                emailRequest.getTemplateName()
         );
         return ResponseEntity.ok("Correo enviado correctamente");
     }

@@ -27,34 +27,35 @@ public class RegisterServiceImpl implements IRegisterService {
     @Override
     //Registra un usuario solo si el correo aún no está registrado.
     public RegisterResponseDto registerUser(RegisterRequestDto request) {
-            if (userRepository.existsByEmail(request.getEmail())) {
-                throw new UserAlreadyExistsException("Correo ya registrado. Intenta iniciar sesión o ingresa un correo distinto.");
-            }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new UserAlreadyExistsException("Correo ya registrado. Intenta iniciar sesión o ingresa un correo distinto.");
+        }
 
-            User user = User.builder()
-                    .name(request.getName())
-                    .age(request.getAge())
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .country(request.getCountry())
-                    .DNI(request.getDNI())
-                    .status(true)
-                    .role(Role.CLIENT)
-                    .build();
+        User user = User.builder()
+                .name(request.getName())
+                .age(request.getAge())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .country(request.getCountry())
+                .DNI(request.getDNI())
+                .status(true)
+                .role(Role.CLIENT)
+                .build();
 
-            User savedUser = userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         Map<String, Object> emailVariables = new HashMap<>();
         emailVariables.put("username", savedUser.getName());
 
-        emailService.sendEmail(savedUser.getEmail(), "¡Bienvenido a Luma!", "welcome-email", emailVariables);
-
-
+        try {
+            emailService.sendEmail(savedUser.getEmail(), "¡Bienvenido a Luma!", "welcome-email");
+        } catch (Exception e) {
+            System.out.println("Error al enviar el correo: " + e.getMessage());
+        }
         return RegisterResponseDto.builder()
-                    .message("¡Registro Exitoso!")
-                    .userId(savedUser.getId())
-                    .build();
-
-
+                .message("¡Registro Exitoso!")
+                .userId(savedUser.getId())
+                .build();
     }
+
 }
