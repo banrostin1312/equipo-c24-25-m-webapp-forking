@@ -26,24 +26,27 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
 public class AccountBankServiceImpl implements IAccountBankService {
 
-    private static  final Logger logger = LoggerFactory.getLogger(AccountBankServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccountBankServiceImpl.class);
 
-     private final IAccountBankRepository accountBankRepository;
-     private final UserRepository userRepository;
-     private final IEmailService emailService;
+    private final IAccountBankRepository accountBankRepository;
+    private final UserRepository userRepository;
+    private final IEmailService emailService;
 
     public AccountBankServiceImpl(IAccountBankRepository accountBankRepository, UserRepository userRepository, IEmailService emailService) {
         this.accountBankRepository = accountBankRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
     }
+
     /**
      * Activa una nueva cuenta bancaria para un usuario.
      * - Si el usuario no existe, lanza una excepción.
@@ -59,12 +62,11 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     @Override
     public ActiveAccountResponseDto activeAccount(ActiveAccountRequestDto requestDto) {
-        logger.error("activando cuenta {} documento usuario" , requestDto.getDocument());
+        logger.error("activando cuenta {} documento usuario", requestDto.getDocument());
 
         User user = this.userRepository.findByDNI(requestDto.getDocument()).orElseThrow(()
 
-                -> new BadRequestExceptions(" usuario con documento" + requestDto.getDocument()+ " no existe"));
-
+                -> new BadRequestExceptions(" usuario con documento" + requestDto.getDocument() + " no existe"));
 
 
         confirmData(requestDto);
@@ -74,14 +76,14 @@ public class AccountBankServiceImpl implements IAccountBankService {
             this.userRepository.save(user);
         }
 
-       AccountBank create =  createBankAccount(user,requestDto);
+        AccountBank create = createBankAccount(user, requestDto);
         AccountBank savedAccount = this.accountBankRepository.save(create);
         sendNotificationEmail(user, "¡Tu cuenta ha sido Activada!",
                 "Tu cuenta bancaria ha sido activada con éxito.");
         return buildAccountResponseDto(savedAccount);
     }
 
-    private void confirmData(ActiveAccountRequestDto requestDto){
+    private void confirmData(ActiveAccountRequestDto requestDto) {
 
 
         int age = Period.between(requestDto.getBirthDate(), LocalDate.now()).getYears();
@@ -91,30 +93,30 @@ public class AccountBankServiceImpl implements IAccountBankService {
         }
 
 
-
     }
 
-    /**Este metodo es opcional, se puede usar
+    /**
+     * Este metodo es opcional, se puede usar
      * para generar mas de una cuenta bancaria
-     * */
+     */
 
-    private  boolean validateAccountCount(User user, ActiveAccountRequestDto requestDto){
+    private boolean validateAccountCount(User user, ActiveAccountRequestDto requestDto) {
 
 
         int accountCount = this.accountBankRepository.countByUser(user);
 
-        if(accountCount >= 2){
+        if (accountCount >= 2) {
             throw new BadRequestExceptions("no puede crear mas de 2 cuentas Bancarias");
         }
 
-        if(accountCount == 0){
+        if (accountCount == 0) {
             System.out.println("puede generar una cuenta mas ");
             //llamar a confirmData
         }
         return true;
     }
 
-    private AccountBank createBankAccount(User user, ActiveAccountRequestDto requestDto){
+    private AccountBank createBankAccount(User user, ActiveAccountRequestDto requestDto) {
 
         return AccountBank.builder()
                 .accountStatus(AccountStatus.ACTIVE)
@@ -148,8 +150,8 @@ public class AccountBankServiceImpl implements IAccountBankService {
         return accountNumber;
     }
 
-    private ActiveAccountResponseDto buildAccountResponseDto(AccountBank accountBank){
-        return  ActiveAccountResponseDto.builder()
+    private ActiveAccountResponseDto buildAccountResponseDto(AccountBank accountBank) {
+        return ActiveAccountResponseDto.builder()
                 .accountNumber(accountBank.getNumber())
                 .accountType(accountBank.getType().name())
                 .accountStatus(accountBank.getAccountStatus().name())
@@ -160,11 +162,11 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     /**
      * Desactiva una cuenta bancaria si cumple con los criterios de validación.
-     *
+     * <p>
      * Este método obtiene el usuario autenticado y verifica que tenga permiso
      * para desactivar la cuenta asociada al id proporcionado.
      * realiza validaciones sobre el estado de la cuenta y el balance .
-     *
+     * <p>
      * Si la cuenta es válida para desactivación, cambia su estado a INACTIVE,
      * registra la fecha guarda datos.
      *
@@ -177,16 +179,16 @@ public class AccountBankServiceImpl implements IAccountBankService {
     @Override
     public DeactivateAccountResponseDto deactivateAccount(Long accountId) {
         String username = getAuthenticatedUser();
-        if(username == null){
+        if (username == null) {
             throw new InvalidCredentialExceptions("Usuario no Autenticado");
         }
 
         AccountBank accountBank = this.accountBankRepository.findById(accountId).orElseThrow(()
                 -> new BadRequestExceptions(" Cuenta no encontrada"));
-       validateOwnership(accountBank,username);
+        validateOwnership(accountBank, username);
 
-       validateAccountStatus(accountBank);
-       validateBalanceAccount(accountBank);
+        validateAccountStatus(accountBank);
+        validateBalanceAccount(accountBank);
 
         accountBank.setAccountStatus(AccountStatus.INACTIVE);
         accountBank.setDateOfDeactivation(LocalDate.now());
@@ -212,7 +214,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
                             .build()
                     )
                     .collect(Collectors.toList());
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error al traer cuentas bancarias" + e);
         }
 
@@ -220,11 +222,11 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     /**
      * Reactiva una cuenta bancaria si cumple con los criterios de validación.
-     *
+     * <p>
      * Este método obtiene el usuario autenticado y verifica que tenga permiso
      * para reactivar la cuenta asociada al id proporcionado.
      * realiza validaciones sobre el estado de la cuenta  .
-     *
+     * <p>
      * Si la cuenta es válida para react9car, cambia su estado a ACTIVE,
      * registra la fecha guarda datos.
      *
@@ -236,14 +238,14 @@ public class AccountBankServiceImpl implements IAccountBankService {
      */
     @Override
     public ReactivateAccountResponseDto reactiveAccount(Long accountId) {
-        String username  = getAuthenticatedUser();
-        if(username == null){
+        String username = getAuthenticatedUser();
+        if (username == null) {
             throw new InvalidCredentialExceptions("Usuario no Autenticado");
         }
         AccountBank accountBank = this.accountBankRepository.findById(accountId).orElseThrow(()
                 -> new CustomAuthenticationException("Error: la cuenta no fue encontrada"));
-        validateOwnership(accountBank,username);
-        if(!accountBank.getAccountStatus().equals(AccountStatus.INACTIVE)){
+        validateOwnership(accountBank, username);
+        if (!accountBank.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new BadRequestExceptions("Solo se puede activar cuentas inactivas");
         }
         accountBank.setAccountStatus(AccountStatus.ACTIVE);
@@ -254,7 +256,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
         return buildReactivateAccountResponseDto(accountBank);
     }
 
-    private DeactivateAccountResponseDto buildDeactivateAccountResponseDto(AccountBank accountBank){
+    private DeactivateAccountResponseDto buildDeactivateAccountResponseDto(AccountBank accountBank) {
         return DeactivateAccountResponseDto.
                 builder()
                 .numberAccount(accountBank.getNumber())
@@ -264,46 +266,58 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     }
 
-    private ReactivateAccountResponseDto buildReactivateAccountResponseDto(AccountBank accountBank){
+    private ReactivateAccountResponseDto buildReactivateAccountResponseDto(AccountBank accountBank) {
         return ReactivateAccountResponseDto.
                 builder()
                 .numberAccount(accountBank.getNumber())
-                .dateOfReactivation( accountBank.getDateOfReactivation() != null ? accountBank.getDateOfReactivation().toString(): "Fecha no disponible")
+                .dateOfReactivation(accountBank.getDateOfReactivation() != null ? accountBank.getDateOfReactivation().toString() : "Fecha no disponible")
                 .message("Cuenta reactivada exitosamente")
                 .build();
 
     }
 
-    private void validateOwnership(AccountBank accountBank, String username){
+    private void validateOwnership(AccountBank accountBank, String username) {
         if (!accountBank.getUser().getEmail().equals(username)) {
-            throw  new CustomAuthenticationException("Error: no esta autorizado para desactivar esta cuenta");
+            throw new CustomAuthenticationException("Error: no esta autorizado para desactivar esta cuenta");
 
         }
 
     }
 
-    private void validateAccountStatus(AccountBank accountBank){
-        switch (accountBank.getAccountStatus()){
+    private void validateAccountStatus(AccountBank accountBank) {
+        switch (accountBank.getAccountStatus()) {
 
-            case INACTIVE -> throw  new   BadRequestExceptions("Error: La cuenta ya ha sido desactivada");
+            case INACTIVE -> throw new BadRequestExceptions("Error: La cuenta ya ha sido desactivada");
             case BLOCKED -> throw new BadRequestExceptions("Error: Su cuenta esta bloqueda no puede ser desactivada");
-            default -> {}
+            default -> {
+            }
         }
     }
 
-    private  void validateBalanceAccount(AccountBank accountBank){
-        if(accountBank.getBalance().compareTo(BigDecimal.ZERO) > 0){
+    private void validateBalanceAccount(AccountBank accountBank) {
+        if (accountBank.getBalance().compareTo(BigDecimal.ZERO) > 0) {
             throw new BadRequestExceptions("Error: su cuenta debe estar en cero");
         }
     }
 
+    //Muestra el saldo en la cuenta
     @Override
     public ActiveAccountResponseDto getBalance(Long accountId) {
-        return null;
+        AccountBank account = accountBankRepository.findById(accountId)
+                .orElseThrow(() -> new BadRequestExceptions("Cuenta no encontrada"));
+
+        return new ActiveAccountResponseDto(
+                account.getNumber(),
+                account.getType().name(),
+                account.getAccountStatus().name(),
+                account.getBalance(),
+                account. getDateOfActivation() != null ? account.getDateOfActivation().toString(): "Fecha no disponible");
     }
-/**metodo para obtener usuario autenticado
- * */
-    public  String getAuthenticatedUser(){
+
+    /**
+     * metodo para obtener usuario autenticado
+     */
+    public String getAuthenticatedUser() {
         Logger logger = LoggerFactory.getLogger(getClass());
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -322,15 +336,23 @@ public class AccountBankServiceImpl implements IAccountBankService {
         }
     }
 
+
+
     private void sendNotificationEmail(User user, String subject, String message) {
+
         String body = "<h1>Banco XYZ</h1>"
+
+
                 + "<p>Hola, " + user.getName() + ".</p>"
+
+
                 + "<p>" + message + "</p>"
+
+
                 + "<p>Gracias por confiar en nosotros.</p>";
 
         emailService.sendEmail(user.getEmail(), subject, body);
+
     }
-
-
-
 }
+

@@ -8,6 +8,5 @@ import java.util.Map;
 public class EmailRequestDto {
     private String to;
     private String subject;
-    private String templateName;
-    private Map<String, Object> variables;
+    private String content;
 }
