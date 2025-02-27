@@ -311,7 +311,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
                 account.getType().name(),
                 account.getAccountStatus().name(),
                 account.getBalance(),
-                account.getDateOfActivation().toString());
+                account. getDateOfActivation() != null ? account.getDateOfActivation().toString(): "Fecha no disponible");
     }
 
     /**
