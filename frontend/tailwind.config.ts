@@ -25,7 +25,11 @@ export default {
         "linkedin-bg" : "#0274B3",
         "youtube-bg" : "#FF0000",
         "input-border":"#3D6697",
-        "border-forms":"#C4C4C4"
+        "border-forms":"#C4C4C4",
+        "estadocuenta-border":"#E6E9EE",
+        "letraestadodecuenta":"#AFAFAF",
+        "transfer-color":"#435D6B",
+        "transfer-inputs":"#93A300"
       },
     },
   },
