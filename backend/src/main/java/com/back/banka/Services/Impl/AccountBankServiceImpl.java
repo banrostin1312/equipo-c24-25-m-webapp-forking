@@ -11,6 +11,7 @@ import com.back.banka.Enums.TokenType;
 import com.back.banka.Exceptions.Custom.BadRequestExceptions;
 import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
+import com.back.banka.Exceptions.Custom.ServiceUnavailableCustomException;
 import com.back.banka.Model.AccountBank;
 import com.back.banka.Model.Tokens;
 import com.back.banka.Model.User;
@@ -22,6 +23,7 @@ import com.back.banka.Services.IServices.IEmailService;
 import com.back.banka.Utils.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,8 +31,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.naming.ServiceUnavailableException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
@@ -46,15 +51,13 @@ public class AccountBankServiceImpl implements IAccountBankService {
     private final IAccountBankRepository accountBankRepository;
     private final UserRepository userRepository;
     private final IEmailService emailService;
-    private final JwtUtil jwtUtil;
-    private final ITokenRepository tokenRepository;
 
-    public AccountBankServiceImpl(IAccountBankRepository accountBankRepository, UserRepository userRepository, IEmailService emailService, JwtUtil jwtUtil, ITokenRepository tokenRepository) {
+
+    public AccountBankServiceImpl(IAccountBankRepository accountBankRepository, UserRepository userRepository, IEmailService emailService) {
         this.accountBankRepository = accountBankRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
-        this.jwtUtil = jwtUtil;
-        this.tokenRepository = tokenRepository;
+
     }
 
     /**
@@ -86,6 +89,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
                     -> new BadRequestExceptions(" usuario con documento" + requestDto.getDocument() + " no existe"));
 
+           int accountCount = validateAccountCount(user);
 
             confirmData(requestDto);
 
@@ -103,9 +107,10 @@ public class AccountBankServiceImpl implements IAccountBankService {
                     "email-template",
                     "Tu cuenta ha sido activada . Gracias por acceder a nuestros servicios bancarios");
             return buildAccountResponseDto(savedAccount);
+        } catch (DataAccessException e) {
+            throw new ServiceUnavailableCustomException("Error al intentar activar la cuenta. Intente más tarde.");
         } catch (Exception e) {
-           throw  new IllegalArgumentException("Error al intentar activar cuenta ", e);
-
+            throw new RuntimeException("Error inesperado al activar la cuenta", e);
         }
     }
 
@@ -126,20 +131,16 @@ public class AccountBankServiceImpl implements IAccountBankService {
      * para generar mas de una cuenta bancaria
      */
 
-    private boolean validateAccountCount(User user, ActiveAccountRequestDto requestDto) {
+    private int validateAccountCount(User user) {
 
 
         int accountCount = this.accountBankRepository.countByUser(user);
 
-        if (accountCount >= 2) {
+        if (accountCount >=2) {
             throw new BadRequestExceptions("no puede crear mas de 2 cuentas Bancarias");
         }
 
-        if (accountCount == 0) {
-            System.out.println("puede generar una cuenta mas ");
-            //llamar a confirmData
-        }
-        return true;
+        return accountCount;
     }
 
     private AccountBank createBankAccount(User user, ActiveAccountRequestDto requestDto) {
@@ -226,8 +227,10 @@ public class AccountBankServiceImpl implements IAccountBankService {
                    "email-template",
                    "Tu cuenta bancaria ha sido desactivada con éxito. debes esperar 2 dias habiles para activarla");
            return buildDeactivateAccountResponseDto(accountBank);
-       }catch (Exception e){
-           throw new IllegalArgumentException("Error al desactivar una cuenta", e);
+       }catch (DataAccessException e ){
+           throw new RuntimeException("Error al desactivar una cuenta", e);
+       } catch (Exception e){
+           throw new ServiceUnavailableCustomException("error inesperado al desactivar cuenta");
        }
     }
 
@@ -282,6 +285,14 @@ public class AccountBankServiceImpl implements IAccountBankService {
             if (!accountBank.getAccountStatus().equals(AccountStatus.INACTIVE)) {
                 throw new BadRequestExceptions("Solo se puede activar cuentas inactivas");
             }
+
+            if (accountBank.getDateOfDeactivation() != null) {
+                Duration timeSinceDeactivation = Duration.between(accountBank.getDateOfDeactivation(), LocalDateTime.now());
+                if (timeSinceDeactivation.toMinutes() < 5) {
+                    throw new BadRequestExceptions("Debe esperar al menos 5 minutos antes de reactivar la cuenta.");
+                }
+            }
+
             accountBank.setAccountStatus(AccountStatus.ACTIVE);
             accountBank.setDateOfReactivation(LocalDate.now());
             sendAccountNotification(
@@ -291,8 +302,10 @@ public class AccountBankServiceImpl implements IAccountBankService {
                     "Tu cuenta bancaria ha sido reactivada con éxito.");
             this.accountBankRepository.save(accountBank);
             return buildReactivateAccountResponseDto(accountBank);
-        }catch (Exception e){
-            throw new IllegalArgumentException("error al reactivar cuenta", e);
+        }catch (DataAccessException e){
+            throw new RuntimeException("error al reactivar cuenta intente mas Tarde", e);
+        } catch (Exception e){
+            throw  new ServiceUnavailableCustomException("error inesperado a l intentar reactivar cuenta");
         }
     }
 
