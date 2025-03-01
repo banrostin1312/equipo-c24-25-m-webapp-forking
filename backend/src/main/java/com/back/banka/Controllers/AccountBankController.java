@@ -5,12 +5,14 @@ import com.back.banka.Dtos.ResponseDto.ActiveAccountResponseDto;
 import com.back.banka.Dtos.ResponseDto.DeactivateAccountResponseDto;
 import com.back.banka.Dtos.ResponseDto.GetAllAccountDto;
 import com.back.banka.Dtos.ResponseDto.ReactivateAccountResponseDto;
+import com.back.banka.Repository.ITokenRepository;
 import com.back.banka.Services.IServices.IAccountBankService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,16 +23,15 @@ import java.util.List;
 
 @SecurityRequirement(name = "bearerAuth")
 @RestController
+@RequiredArgsConstructor
 @PreAuthorize("hasRole('CLIENT')")
 @RequestMapping("/api/banca/cuenta-bancaria")
 public class AccountBankController {
 
     private final IAccountBankService accountBankService;
+    private final ITokenRepository tokenRepository;
 
-    @Autowired
-    public AccountBankController(IAccountBankService accountBankService) {
-        this.accountBankService = accountBankService;
-    }
+
     @Operation(summary = "Activar cuenta bancaria",
             description = "Permite activar una cuenta bancaria para un usuario registrado y con rol CLIENT. "
                     + "Si el usuario activa su primera cuenta, se validan datos como documento, fecha de nacimiento y frase de seguridad. "
@@ -108,4 +109,6 @@ public class AccountBankController {
         ActiveAccountResponseDto accountResponseDto = this.accountBankService.getBalance(accountId);
         return  ResponseEntity.status(HttpStatus.OK).body(accountResponseDto);
     }
+
+
 }

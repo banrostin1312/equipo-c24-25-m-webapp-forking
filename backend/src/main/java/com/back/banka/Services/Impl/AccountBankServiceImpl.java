@@ -7,21 +7,27 @@ import com.back.banka.Dtos.ResponseDto.GetAllAccountDto;
 import com.back.banka.Dtos.ResponseDto.ReactivateAccountResponseDto;
 import com.back.banka.Enums.AccountStatus;
 import com.back.banka.Enums.AccountType;
+import com.back.banka.Enums.TokenType;
 import com.back.banka.Exceptions.Custom.BadRequestExceptions;
 import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
 import com.back.banka.Model.AccountBank;
+import com.back.banka.Model.Tokens;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.IAccountBankRepository;
+import com.back.banka.Repository.ITokenRepository;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IAccountBankService;
 import com.back.banka.Services.IServices.IEmailService;
+import com.back.banka.Utils.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,11 +46,15 @@ public class AccountBankServiceImpl implements IAccountBankService {
     private final IAccountBankRepository accountBankRepository;
     private final UserRepository userRepository;
     private final IEmailService emailService;
+    private final JwtUtil jwtUtil;
+    private final ITokenRepository tokenRepository;
 
-    public AccountBankServiceImpl(IAccountBankRepository accountBankRepository, UserRepository userRepository, IEmailService emailService) {
+    public AccountBankServiceImpl(IAccountBankRepository accountBankRepository, UserRepository userRepository, IEmailService emailService, JwtUtil jwtUtil, ITokenRepository tokenRepository) {
         this.accountBankRepository = accountBankRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.jwtUtil = jwtUtil;
+        this.tokenRepository = tokenRepository;
     }
 
     /**
@@ -62,6 +72,13 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     @Override
     public ActiveAccountResponseDto activeAccount(ActiveAccountRequestDto requestDto) {
+
+        String auth = getAuthenticatedUser();
+
+        if (auth == null) {
+            throw new InvalidCredentialExceptions("Usuario no Autenticado");
+        }
+
         logger.error("activando cuenta {} documento usuario", requestDto.getDocument());
 
         User user = this.userRepository.findByDNI(requestDto.getDocument()).orElseThrow(()
@@ -78,8 +95,9 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
         AccountBank create = createBankAccount(user, requestDto);
         AccountBank savedAccount = this.accountBankRepository.save(create);
-        sendNotificationEmail(user, "¡Tu cuenta ha sido Activada!",
-                "Tu cuenta bancaria ha sido activada con éxito.");
+
+        sendNotificationEmail(user, "¡Confirmación de proceso de activacion de cuenta!",
+                "Tu cuenta ha sido activada . Gracias por acceder a nuestros servicios bancarios");
         return buildAccountResponseDto(savedAccount);
     }
 
@@ -266,6 +284,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     }
 
+
     private ReactivateAccountResponseDto buildReactivateAccountResponseDto(AccountBank accountBank) {
         return ReactivateAccountResponseDto.
                 builder()
@@ -354,5 +373,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
         emailService.sendEmail(user.getEmail(), subject, body);
 
     }
+
+
 }
 

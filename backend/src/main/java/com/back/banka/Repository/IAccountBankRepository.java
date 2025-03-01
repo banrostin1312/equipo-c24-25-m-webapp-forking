@@ -1,5 +1,6 @@
 package com.back.banka.Repository;
 
+import com.back.banka.Enums.AccountStatus;
 import com.back.banka.Model.AccountBank;
 import com.back.banka.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,5 @@ public interface IAccountBankRepository extends JpaRepository<AccountBank, Long>
     int countByUser(User user);
     Optional<AccountBank> findByNumber(String number);
     Optional<AccountBank> findById(Long id);
+    Optional<AccountBank> findByUserIdAndAccountStatus(Long userId, AccountStatus accountStatus);
 }
