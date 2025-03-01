@@ -73,32 +73,40 @@ public class AccountBankServiceImpl implements IAccountBankService {
     @Override
     public ActiveAccountResponseDto activeAccount(ActiveAccountRequestDto requestDto) {
 
-        String auth = getAuthenticatedUser();
+        try {
+            String auth = getAuthenticatedUser();
 
-        if (auth == null) {
-            throw new InvalidCredentialExceptions("Usuario no Autenticado");
+            if (auth == null) {
+                throw new InvalidCredentialExceptions("Usuario no Autenticado");
+            }
+
+            logger.error("activando cuenta {} documento usuario", requestDto.getDocument());
+
+            User user = this.userRepository.findByDNI(requestDto.getDocument()).orElseThrow(()
+
+                    -> new BadRequestExceptions(" usuario con documento" + requestDto.getDocument() + " no existe"));
+
+
+            confirmData(requestDto);
+
+            if (user.getDateBirthDay() == null) {
+                user.setDateBirthDay(requestDto.getBirthDate());
+                this.userRepository.save(user);
+            }
+
+            AccountBank create = createBankAccount(user, requestDto);
+            AccountBank savedAccount = this.accountBankRepository.save(create);
+
+            sendAccountNotification(
+                    user,
+                    "¡Confirmación de proceso de activacion de cuenta!",
+                    "email-template",
+                    "Tu cuenta ha sido activada . Gracias por acceder a nuestros servicios bancarios");
+            return buildAccountResponseDto(savedAccount);
+        } catch (Exception e) {
+           throw  new IllegalArgumentException("Error al intentar activar cuenta ", e);
+
         }
-
-        logger.error("activando cuenta {} documento usuario", requestDto.getDocument());
-
-        User user = this.userRepository.findByDNI(requestDto.getDocument()).orElseThrow(()
-
-                -> new BadRequestExceptions(" usuario con documento" + requestDto.getDocument() + " no existe"));
-
-
-        confirmData(requestDto);
-
-        if (user.getDateBirthDay() == null) {
-            user.setDateBirthDay(requestDto.getBirthDate());
-            this.userRepository.save(user);
-        }
-
-        AccountBank create = createBankAccount(user, requestDto);
-        AccountBank savedAccount = this.accountBankRepository.save(create);
-
-        sendNotificationEmail(user, "¡Confirmación de proceso de activacion de cuenta!",
-                "Tu cuenta ha sido activada . Gracias por acceder a nuestros servicios bancarios");
-        return buildAccountResponseDto(savedAccount);
     }
 
     private void confirmData(ActiveAccountRequestDto requestDto) {
@@ -196,24 +204,31 @@ public class AccountBankServiceImpl implements IAccountBankService {
      */
     @Override
     public DeactivateAccountResponseDto deactivateAccount(Long accountId) {
-        String username = getAuthenticatedUser();
-        if (username == null) {
-            throw new InvalidCredentialExceptions("Usuario no Autenticado");
-        }
+       try {
+           String username = getAuthenticatedUser();
+           if (username == null) {
+               throw new InvalidCredentialExceptions("Usuario no Autenticado");
+           }
 
-        AccountBank accountBank = this.accountBankRepository.findById(accountId).orElseThrow(()
-                -> new BadRequestExceptions(" Cuenta no encontrada"));
-        validateOwnership(accountBank, username);
+           AccountBank accountBank = this.accountBankRepository.findById(accountId).orElseThrow(()
+                   -> new BadRequestExceptions(" Cuenta no encontrada"));
+           validateOwnership(accountBank, username);
 
-        validateAccountStatus(accountBank);
-        validateBalanceAccount(accountBank);
+           validateAccountStatus(accountBank);
+           validateBalanceAccount(accountBank);
 
-        accountBank.setAccountStatus(AccountStatus.INACTIVE);
-        accountBank.setDateOfDeactivation(LocalDate.now());
-        this.accountBankRepository.save(accountBank);
-        sendNotificationEmail(accountBank.getUser(), "¡Tu cuenta ha sido Desactivada!",
-                "Tu cuenta bancaria ha sido desactivada con éxito.");
-        return buildDeactivateAccountResponseDto(accountBank);
+           accountBank.setAccountStatus(AccountStatus.INACTIVE);
+           accountBank.setDateOfDeactivation(LocalDate.now());
+           this.accountBankRepository.save(accountBank);
+           sendAccountNotification(
+                   accountBank.getUser(),
+                   "¡Tu cuenta ha sido Desactivada!",
+                   "email-template",
+                   "Tu cuenta bancaria ha sido desactivada con éxito. debes esperar 2 dias habiles para activarla");
+           return buildDeactivateAccountResponseDto(accountBank);
+       }catch (Exception e){
+           throw new IllegalArgumentException("Error al desactivar una cuenta", e);
+       }
     }
 
     @Override
@@ -256,22 +271,29 @@ public class AccountBankServiceImpl implements IAccountBankService {
      */
     @Override
     public ReactivateAccountResponseDto reactiveAccount(Long accountId) {
-        String username = getAuthenticatedUser();
-        if (username == null) {
-            throw new InvalidCredentialExceptions("Usuario no Autenticado");
+        try {
+            String username = getAuthenticatedUser();
+            if (username == null) {
+                throw new InvalidCredentialExceptions("Usuario no Autenticado");
+            }
+            AccountBank accountBank = this.accountBankRepository.findById(accountId).orElseThrow(()
+                    -> new CustomAuthenticationException("Error: la cuenta no fue encontrada"));
+            validateOwnership(accountBank, username);
+            if (!accountBank.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+                throw new BadRequestExceptions("Solo se puede activar cuentas inactivas");
+            }
+            accountBank.setAccountStatus(AccountStatus.ACTIVE);
+            accountBank.setDateOfReactivation(LocalDate.now());
+            sendAccountNotification(
+                    accountBank.getUser(),
+                    "¡Tu cuenta ha sido reactivada!",
+                    "email-template",
+                    "Tu cuenta bancaria ha sido reactivada con éxito.");
+            this.accountBankRepository.save(accountBank);
+            return buildReactivateAccountResponseDto(accountBank);
+        }catch (Exception e){
+            throw new IllegalArgumentException("error al reactivar cuenta", e);
         }
-        AccountBank accountBank = this.accountBankRepository.findById(accountId).orElseThrow(()
-                -> new CustomAuthenticationException("Error: la cuenta no fue encontrada"));
-        validateOwnership(accountBank, username);
-        if (!accountBank.getAccountStatus().equals(AccountStatus.INACTIVE)) {
-            throw new BadRequestExceptions("Solo se puede activar cuentas inactivas");
-        }
-        accountBank.setAccountStatus(AccountStatus.ACTIVE);
-        accountBank.setDateOfReactivation(LocalDate.now());
-        sendNotificationEmail(accountBank.getUser(), "¡Tu cuenta ha sido reactivada!",
-                "Tu cuenta bancaria ha sido reactivada con éxito.");
-        this.accountBankRepository.save(accountBank);
-        return buildReactivateAccountResponseDto(accountBank);
     }
 
     private DeactivateAccountResponseDto buildDeactivateAccountResponseDto(AccountBank accountBank) {
@@ -356,23 +378,19 @@ public class AccountBankServiceImpl implements IAccountBankService {
     }
 
 
+    private void sendAccountNotification(User user, String subject, String templateName, String message) {
+        Map<String, Object> emailVariables = new HashMap<>();
+        emailVariables.put("name", user.getName());
+        emailVariables.put("message", message);
 
-    private void sendNotificationEmail(User user, String subject, String message) {
-
-        String body = "<h1>Banco XYZ</h1>"
-
-
-                + "<p>Hola, " + user.getName() + ".</p>"
-
-
-                + "<p>" + message + "</p>"
-
-
-                + "<p>Gracias por confiar en nosotros.</p>";
-
-        emailService.sendEmail(user.getEmail(), subject, body);
-
+        emailService.sendEmailTemplate(
+                user.getEmail(),
+                subject,
+                templateName,
+                emailVariables
+        );
     }
+
 
 
 }

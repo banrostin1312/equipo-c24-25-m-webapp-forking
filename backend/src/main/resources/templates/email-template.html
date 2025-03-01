@@ -1,10 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>LUMA</title>
+    <title>Banco LUMA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .content h1 {
+            color: #333;
+        }
+        .content p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-<h1>¡Hola, "${username}"!</h1>
+<div class="container">
+    <!-- Encabezado con logo -->
+    <div class="header">
+<!--        <img src="https://yourbanklogo.com/logo.png" alt="Banco LUMA" th:src="@{https://yourbanklogo.com/logo.png}">-->
+    </div>
+
+    <!-- Contenido del correo -->
+    <div class="content">
+        <h1>Banca Virtual LUMA</h1>
+        <p>Hola, <span th:text="${name}"></span>.</p>
+        <p th:text="${message}"></p>
+
+    </div>
+
+    <!-- Pie de página -->
+    <div class="footer">
+        <p>&copy; 2025 Banco LUMA. Todos los derechos reservados.</p>
+        <p>Si necesitas ayuda, contáctanos en <a href="mailto:soporte@bancoluma.com">soporte@bancoluma.com</a></p>
+    </div>
+</div>
 </body>
 </html>
