@@ -38,7 +38,7 @@ public class RegisterServiceImpl implements IRegisterService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .country(request.getCountry())
                 .DNI(request.getDNI())
-                .status(true)
+                .active(true)
                 .role(Role.CLIENT)
                 .build();
 

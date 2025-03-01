@@ -14,5 +14,6 @@ public interface IAccountBankRepository extends JpaRepository<AccountBank, Long>
     int countByUser(User user);
     Optional<AccountBank> findByNumber(String number);
     Optional<AccountBank> findById(Long id);
+    Optional<AccountBank> findByIdAndAccountStatus(Long id, AccountStatus accountStatus);
     Optional<AccountBank> findByUserIdAndAccountStatus(Long userId, AccountStatus accountStatus);
 }

@@ -20,7 +20,9 @@ import com.back.banka.Repository.ITokenRepository;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IAccountBankService;
 import com.back.banka.Services.IServices.IEmailService;
+import com.back.banka.Utils.IUtilsService;
 import com.back.banka.Utils.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -44,21 +46,17 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AccountBankServiceImpl implements IAccountBankService {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountBankServiceImpl.class);
 
     private final IAccountBankRepository accountBankRepository;
     private final UserRepository userRepository;
-    private final IEmailService emailService;
+    private final IUtilsService utilsService;
 
 
-    public AccountBankServiceImpl(IAccountBankRepository accountBankRepository, UserRepository userRepository, IEmailService emailService) {
-        this.accountBankRepository = accountBankRepository;
-        this.userRepository = userRepository;
-        this.emailService = emailService;
 
-    }
 
     /**
      * Activa una nueva cuenta bancaria para un usuario.
@@ -77,7 +75,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
     public ActiveAccountResponseDto activeAccount(ActiveAccountRequestDto requestDto) {
 
         try {
-            String auth = getAuthenticatedUser();
+            String auth =  this.utilsService.getAuthenticatedUser();
 
             if (auth == null) {
                 throw new InvalidCredentialExceptions("Usuario no Autenticado");
@@ -101,7 +99,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
             AccountBank create = createBankAccount(user, requestDto);
             AccountBank savedAccount = this.accountBankRepository.save(create);
 
-            sendAccountNotification(
+            this.utilsService.sendAccountNotification(
                     user,
                     "¡Confirmación de proceso de activacion de cuenta!",
                     "email-template",
@@ -206,22 +204,21 @@ public class AccountBankServiceImpl implements IAccountBankService {
     @Override
     public DeactivateAccountResponseDto deactivateAccount(Long accountId) {
        try {
-           String username = getAuthenticatedUser();
+           String username = this.utilsService.getAuthenticatedUser();
            if (username == null) {
                throw new InvalidCredentialExceptions("Usuario no Autenticado");
            }
 
            AccountBank accountBank = this.accountBankRepository.findById(accountId).orElseThrow(()
                    -> new BadRequestExceptions(" Cuenta no encontrada"));
-           validateOwnership(accountBank, username);
+           this.utilsService.validateOwnership(accountBank, username);
 
-           validateAccountStatus(accountBank);
-           validateBalanceAccount(accountBank);
-
+           this.utilsService.validateAccountStatus(accountBank);
+           this.utilsService.validateBalanceAccount(accountBank);
            accountBank.setAccountStatus(AccountStatus.INACTIVE);
            accountBank.setDateOfDeactivation(LocalDate.now());
            this.accountBankRepository.save(accountBank);
-           sendAccountNotification(
+           this.utilsService.sendAccountNotification(
                    accountBank.getUser(),
                    "¡Tu cuenta ha sido Desactivada!",
                    "email-template",
@@ -237,6 +234,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
     @Override
     public List<GetAllAccountDto> getAllAccounts() {
         try {
+
             List<AccountBank> accountBanks = this.accountBankRepository.findAll();
 
             return accountBanks.stream()
@@ -275,13 +273,13 @@ public class AccountBankServiceImpl implements IAccountBankService {
     @Override
     public ReactivateAccountResponseDto reactiveAccount(Long accountId) {
         try {
-            String username = getAuthenticatedUser();
+            String username = this.utilsService.getAuthenticatedUser();
             if (username == null) {
                 throw new InvalidCredentialExceptions("Usuario no Autenticado");
             }
             AccountBank accountBank = this.accountBankRepository.findById(accountId).orElseThrow(()
                     -> new CustomAuthenticationException("Error: la cuenta no fue encontrada"));
-            validateOwnership(accountBank, username);
+            this.utilsService.validateOwnership(accountBank, username);
             if (!accountBank.getAccountStatus().equals(AccountStatus.INACTIVE)) {
                 throw new BadRequestExceptions("Solo se puede activar cuentas inactivas");
             }
@@ -298,7 +296,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
             accountBank.setAccountStatus(AccountStatus.ACTIVE);
             accountBank.setDateOfReactivation(LocalDate.now());
-            sendAccountNotification(
+            this.utilsService.sendAccountNotification(
                     accountBank.getUser(),
                     "¡Tu cuenta ha sido reactivada!",
                     "email-template",
@@ -338,79 +336,31 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
     }
 
-    private void validateOwnership(AccountBank accountBank, String username) {
-        if (!accountBank.getUser().getEmail().equals(username)) {
-            throw new CustomAuthenticationException("Error: no esta autorizado para desactivar esta cuenta");
-
-        }
-
-    }
-
-    private void validateAccountStatus(AccountBank accountBank) {
-        switch (accountBank.getAccountStatus()) {
-
-            case INACTIVE -> throw new BadRequestExceptions("Error: La cuenta ya ha sido desactivada");
-            case BLOCKED -> throw new BadRequestExceptions("Error: Su cuenta esta bloqueda no puede ser desactivada");
-            default -> {
-            }
-        }
-    }
-
-    private void validateBalanceAccount(AccountBank accountBank) {
-        if (accountBank.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-            throw new BadRequestExceptions("Error: su cuenta debe estar en cero");
-        }
-    }
 
     //Muestra el saldo en la cuenta
     @Override
     public ActiveAccountResponseDto getBalance(Long accountId) {
-        AccountBank account = accountBankRepository.findById(accountId)
-                .orElseThrow(() -> new BadRequestExceptions("Cuenta no encontrada"));
+        try {
+            String username = this.utilsService.getAuthenticatedUser();
+            if(username == null ){
+                throw new CustomAuthenticationException("usuario no autenticado");
+            }
 
-        return new ActiveAccountResponseDto(
-                account.getNumber(),
-                account.getType().name(),
-                account.getAccountStatus().name(),
-                account.getBalance(),
-                account. getDateOfActivation() != null ? account.getDateOfActivation().toString(): "Fecha no disponible");
-    }
-
-    /**
-     * metodo para obtener usuario autenticado
-     */
-    public String getAuthenticatedUser() {
-        Logger logger = LoggerFactory.getLogger(getClass());
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            logger.error("No hay autenticación en el contexto de seguridad.");
-            return null;
-        }
-
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails) {
-            logger.info(" Usuario autenticado: " + ((UserDetails) principal).getUsername());
-            return ((UserDetails) principal).getUsername();
-        } else {
-            logger.error(" El usuario no está autenticado correctamente.");
-            return null;
+            AccountBank account = accountBankRepository.findByIdAndAccountStatus(accountId,AccountStatus.ACTIVE)
+                    .orElseThrow(() -> new BadRequestExceptions("Cuenta no encontrada"));
+            return new ActiveAccountResponseDto(
+                    account.getNumber(),
+                    account.getType().name(),
+                    account.getAccountStatus().name(),
+                    account.getBalance(),
+                    account.getDateOfActivation() != null ? account.getDateOfActivation().toString() : "Fecha no disponible");
+        }catch (DataAccessException e){
+            throw new RuntimeException("erroro al traer balance de cuenta");
+        } catch (Exception e){
+          throw new  ServiceUnavailableCustomException("Error inesperado ");
         }
     }
 
-
-    private void sendAccountNotification(User user, String subject, String templateName, String message) {
-        Map<String, Object> emailVariables = new HashMap<>();
-        emailVariables.put("name", user.getName());
-        emailVariables.put("message", message);
-
-        emailService.sendEmailTemplate(
-                user.getEmail(),
-                subject,
-                templateName,
-                emailVariables
-        );
-    }
 
 
 

@@ -41,7 +41,7 @@ import java.util.List;
         private Role role;
 
         @Column(nullable = false)
-        private boolean status;
+        private boolean active;
 
         @Column(nullable = false,unique = true)
         private String DNI;
@@ -123,11 +123,11 @@ import java.util.List;
         }
 
         public boolean isStatus() {
-            return status;
+            return active;
         }
 
         public void setStatus(boolean status) {
-            this.status = status;
+            this.active = status;
         }
     }
 
