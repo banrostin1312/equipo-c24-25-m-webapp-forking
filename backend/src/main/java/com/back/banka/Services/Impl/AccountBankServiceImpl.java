@@ -120,7 +120,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
         int age = Period.between(requestDto.getBirthDate(), LocalDate.now()).getYears();
 
         if (age < 18 || age > 120) {
-            throw new BadRequestExceptions("Edad inválida. Debe ser mayor de edad y menor de 120 años.");
+            throw new BadRequestExceptions("Edad inválida. Debe ser mayor de edad.");
         }
 
 
@@ -225,7 +225,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
                    accountBank.getUser(),
                    "¡Tu cuenta ha sido Desactivada!",
                    "email-template",
-                   "Tu cuenta bancaria ha sido desactivada con éxito. debes esperar 2 dias habiles para activarla");
+                   "Tu cuenta bancaria ha sido desactivada con éxito. debes esperar 5 dias habiles para activarla");
            return buildDeactivateAccountResponseDto(accountBank);
        }catch (DataAccessException e ){
            throw new RuntimeException("Error al desactivar una cuenta", e);
@@ -287,7 +287,10 @@ public class AccountBankServiceImpl implements IAccountBankService {
             }
 
             if (accountBank.getDateOfDeactivation() != null) {
-                Duration timeSinceDeactivation = Duration.between(accountBank.getDateOfDeactivation(), LocalDateTime.now());
+                LocalDateTime deactivationDateTime = accountBank.getDateOfDeactivation().atTime(23, 59, 59);
+
+                Duration timeSinceDeactivation = Duration.between(deactivationDateTime, LocalDateTime.now());
+
                 if (timeSinceDeactivation.toMinutes() < 5) {
                     throw new BadRequestExceptions("Debe esperar al menos 5 minutos antes de reactivar la cuenta.");
                 }
@@ -302,6 +305,8 @@ public class AccountBankServiceImpl implements IAccountBankService {
                     "Tu cuenta bancaria ha sido reactivada con éxito.");
             this.accountBankRepository.save(accountBank);
             return buildReactivateAccountResponseDto(accountBank);
+        } catch (InvalidCredentialExceptions | CustomAuthenticationException | BadRequestExceptions e) {
+            throw e;
         }catch (DataAccessException e){
             throw new RuntimeException("error al reactivar cuenta intente mas Tarde", e);
         } catch (Exception e){
@@ -312,6 +317,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
     private DeactivateAccountResponseDto buildDeactivateAccountResponseDto(AccountBank accountBank) {
         return DeactivateAccountResponseDto.
                 builder()
+                .UserId(accountBank.getUser().getId())
                 .numberAccount(accountBank.getNumber())
                 .dateDeactivated(accountBank.getDateOfDeactivation() != null ? accountBank.getDateOfDeactivation().toString() : "Fecha no disponible")
                 .statusAccount(accountBank.getAccountStatus().name())
@@ -323,6 +329,8 @@ public class AccountBankServiceImpl implements IAccountBankService {
     private ReactivateAccountResponseDto buildReactivateAccountResponseDto(AccountBank accountBank) {
         return ReactivateAccountResponseDto.
                 builder()
+                .id(accountBank.getId())
+                .UserId(accountBank.getUser().getId())
                 .numberAccount(accountBank.getNumber())
                 .dateOfReactivation(accountBank.getDateOfReactivation() != null ? accountBank.getDateOfReactivation().toString() : "Fecha no disponible")
                 .message("Cuenta reactivada exitosamente")
