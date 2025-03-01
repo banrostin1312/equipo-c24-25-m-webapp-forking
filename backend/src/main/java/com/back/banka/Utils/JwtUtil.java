@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.security.Key;
@@ -22,19 +23,17 @@ public class JwtUtil {
     private final Key key;
     private final long expirationTime;
     private final Long jwtRefreshExpirationTime;
-    private final Long jwtActivateAccountExpirationTime;
 
 
-    public JwtUtil(@Value("${JWT_SECRET}")
+    public JwtUtil(@Value("${jwt.secret}")
                    String secret,
-                   @Value("${JWT_EXPIRATION}")
+                   @Value("${jwt.expiration}")
                    long expiration,
-                   @Value("${JWT_REFRESH_EXPIRATION}")
-                   Long jwtRefreshExpirationTime,
-                   @Value("${activate.bankAccount}")
-                   Long jwtActivateAccountExpirationTime
+                   @Value("${jwt.refresh-expiration}")
+                   Long jwtRefreshExpirationTime
+
     ){
-        this.jwtActivateAccountExpirationTime = jwtActivateAccountExpirationTime;
+
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(keyBytes); //Generando clave con HS256
         this.expirationTime = expiration;
@@ -80,9 +79,6 @@ public class JwtUtil {
         return generateToken(email, expirationTime);
     }
 
-    public String generateActivateAccountToken(String email){
-        return generateToken(email, jwtActivateAccountExpirationTime);
-    }
 
 
     public boolean isTokenValid(String token, UserDetails user) {
@@ -141,7 +137,5 @@ public class JwtUtil {
         Claims claims = getClaims(token);
         return claimsResolver.apply(claims);
     }
-    public List<String> extractRoles(String token) {
-        return extractClaim(token, claims -> claims.get("authorities", List.class));
-    }
+
 }

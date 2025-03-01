@@ -29,10 +29,10 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class UserServiceImpl implements IUserService {
+public class AuthServiceImpl implements IUserService {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
 
     private final UserRepository userRepository;
@@ -41,7 +41,7 @@ public class UserServiceImpl implements IUserService {
     private final ITokenRepository tokenRepository;
     private final UserDetailsServiceImpl userDetailsService;
 
-    public UserServiceImpl(UserRepository userRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtUtil jwtService, ITokenRepository tokenRepository, UserDetailsServiceImpl userDetailsService) {
+    public AuthServiceImpl(UserRepository userRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtUtil jwtService, ITokenRepository tokenRepository, UserDetailsServiceImpl userDetailsService) {
         this.userRepository = userRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.jwtService = jwtService;

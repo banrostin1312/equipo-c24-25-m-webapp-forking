@@ -222,7 +222,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
                    accountBank.getUser(),
                    "¡Tu cuenta ha sido Desactivada!",
                    "email-template",
-                   "Tu cuenta bancaria ha sido desactivada con éxito. debes esperar 5 dias habiles para activarla");
+                   "Tu cuenta bancaria ha sido desactivada con éxito. debes esperar 5 minutos habiles para activarla");
            return buildDeactivateAccountResponseDto(accountBank);
        }catch (DataAccessException e ){
            throw new RuntimeException("Error al desactivar una cuenta", e);
@@ -306,7 +306,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
         } catch (InvalidCredentialExceptions | CustomAuthenticationException | BadRequestExceptions e) {
             throw e;
         }catch (DataAccessException e){
-            throw new RuntimeException("error al reactivar cuenta intente mas Tarde", e);
+            throw new RuntimeException("error al reactivar cuenta, intente mas Tarde", e);
         } catch (Exception e){
             throw  new ServiceUnavailableCustomException("error inesperado a l intentar reactivar cuenta");
         }

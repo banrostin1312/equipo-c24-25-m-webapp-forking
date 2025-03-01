@@ -1,10 +1,10 @@
 package com.back.banka.Config;
-
 import com.back.banka.Utils.JwtAuthenticationFilter;
 import com.back.banka.Utils.JwtEntryPoint;
 import com.back.banka.Utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,11 +28,15 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final CustomLogoutHandler logoutHandler;
 
-    public SecurityConfig(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+    public SecurityConfig(JwtUtil jwtUtil, UserDetailsService userDetailsService, CustomLogoutHandler logoutHandler) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.logoutHandler = logoutHandler;
     }
+
+
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -84,11 +88,19 @@ public class SecurityConfig {
                                 manage.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 )
+                .logout( logout ->
+                        logout
+                                .logoutUrl("/api/banca/auth/logout")
+                                .addLogoutHandler(logoutHandler)
+                                .logoutSuccessHandler((request, response, authentication)
+                                        -> response.setStatus(HttpStatus.OK.value()) )
+                )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 
    return  http.build();
     }
+
 
 
 

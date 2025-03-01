@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,4 +101,19 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(getAllUser);
 
      }
+
+    @Operation(
+            summary = "Cerrar sesión",
+            description = "Cierra la sesión invalidando el token actual",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sesión cerrada correctamente"),
+            @ApiResponse(responseCode = "401", description = "No autorizado")
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        return ResponseEntity.ok("Sesión cerrada correctamente");
+    }
+
 }
