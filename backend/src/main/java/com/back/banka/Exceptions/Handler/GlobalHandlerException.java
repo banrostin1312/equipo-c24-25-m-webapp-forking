@@ -36,7 +36,26 @@ public class GlobalHandlerException {
 
         return new ResponseEntity<>(errorResponseDto,HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(ServiceUnavailableCustomException.class)
+    private ResponseEntity<ErrorResponseDto> serviceUnavailableHandlerException(ServiceUnavailableCustomException exception){
+        ErrorResponseDto  errorResponseDto = ErrorResponseDto.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(exception.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
 
+        return new ResponseEntity<>(errorResponseDto,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @ExceptionHandler(ModelNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleModelNotfoundException(ModelNotFoundException exception){
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .message(exception.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
+
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(InvalidCredentialExceptions.class)
     public ResponseEntity<ErrorResponseDto> handleInvalidCredentials(InvalidCredentialExceptions exception){
