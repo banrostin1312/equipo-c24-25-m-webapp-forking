@@ -3,6 +3,7 @@ package com.back.banka.Services.Impl;
 import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
 import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
 import com.back.banka.Enums.Role;
+import com.back.banka.Exceptions.Custom.DniAlreadyExistsException;
 import com.back.banka.Exceptions.Custom.UserAlreadyExistsException;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.UserRepository;
@@ -29,6 +30,9 @@ public class RegisterServiceImpl implements IRegisterService {
     public RegisterResponseDto registerUser(RegisterRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException("Correo ya registrado. Intenta iniciar sesión o ingresa un correo distinto.");
+        }
+        if (userRepository.existsByDNI(request.getDNI())) {
+            throw new DniAlreadyExistsException("El DNI ya está registrado");
         }
 
         User user = User.builder()

@@ -1,4 +1,5 @@
 package com.back.banka.Dtos.RequestDto;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class RegisterRequestDto {
     @NotBlank(message = "Campo obligatorio")
     @Size(min = 8, max = 8, message = "El DNI debe tener exactamente 8 caracteres")
     @Pattern(regexp = "\\d{8}", message = "El DNI debe contener solo números")
+    @Column(name = "dni", nullable = false, unique = true)
     private String DNI;
 
 }
