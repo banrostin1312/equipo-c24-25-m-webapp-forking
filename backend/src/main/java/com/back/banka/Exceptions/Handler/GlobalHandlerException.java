@@ -121,5 +121,16 @@ public class GlobalHandlerException {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(DniAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDto> handleUserAlreadyExistsException(DniAlreadyExistsException ex) {
+        ErrorResponseDto errorResponse = ErrorResponseDto.builder()
+                .code(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
 
 }
