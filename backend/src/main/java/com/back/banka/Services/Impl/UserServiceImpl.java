@@ -1,6 +1,7 @@
 package com.back.banka.Services.Impl;
 import com.back.banka.Dtos.RequestDto.ResetPasswordRequestDto;
 import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
+import com.back.banka.Exceptions.Custom.UserNotFoundException;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IEmailService;
@@ -52,7 +53,7 @@ public class UserServiceImpl implements IUserService {
     public void sendPasswordResetEmail(String email) {
         try {
             User user = this.userRepository.findByEmail(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+                    .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
 
             String tokenJwt = this.jwtUtil.generateResetPasswordToken(email);
             String resetUrl = "https://equipo-c24-25-m-webapp-1.onrender.com/recuperar-contrasenia?token=" + tokenJwt;
@@ -61,7 +62,8 @@ public class UserServiceImpl implements IUserService {
 
             Map<String, Object> emailVariables = new HashMap<>();
             emailVariables.put("name", user.getName());
-            emailVariables.put("message", "Hola, a través de este correo podrás configurar tu contraseña.");
+            emailVariables.put("message", "Hola, " +
+                    "a través de este correo podrás configurar tu contraseña.");
             emailVariables.put("resetUrl", resetUrl);
             try {
                 this.emailService.sendEmailTemplate(
@@ -96,17 +98,20 @@ MEtodo para actualizar la contraseña de un usuario en la base de datos.
             String username = jwtUtil.extractEmail(requestDto.getToken());
             if (username == null || username.isEmpty()) {
                 log.error("El email extraído es nulo o vacío");
+
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
             }
             log.info("Email extraído: " + username);
 
             if (requestDto.getToken() == null || !jwtUtil.validateToken(requestDto.getToken())) {
                 log.error("Token inválido");
+
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
             }
 
             User user = userRepository.findByEmail(username).orElseThrow(() -> {
                 log.error("Usuario no encontrado para el email: " + username);
+
                 return new UsernameNotFoundException("Usuario no encontrado");
             });
             log.info("Usuario encontrado: " + user.getEmail());

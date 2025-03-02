@@ -8,10 +8,7 @@ import com.back.banka.Dtos.ResponseDto.ReactivateAccountResponseDto;
 import com.back.banka.Enums.AccountStatus;
 import com.back.banka.Enums.AccountType;
 import com.back.banka.Enums.TokenType;
-import com.back.banka.Exceptions.Custom.BadRequestExceptions;
-import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
-import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
-import com.back.banka.Exceptions.Custom.ServiceUnavailableCustomException;
+import com.back.banka.Exceptions.Custom.*;
 import com.back.banka.Model.AccountBank;
 import com.back.banka.Model.Tokens;
 import com.back.banka.Model.User;
@@ -343,24 +340,25 @@ public class AccountBankServiceImpl implements IAccountBankService {
     @Transactional(readOnly = true)
     @Override
     public ActiveAccountResponseDto getBalance(Long accountId) {
-        try {
+        {
             String username = this.utilsService.getAuthenticatedUser();
-            if(username == null ){
+            if (username == null) {
                 throw new CustomAuthenticationException("usuario no autenticado");
             }
 
-            AccountBank account = accountBankRepository.findByIdAndAccountStatus(accountId,AccountStatus.ACTIVE)
-                    .orElseThrow(() -> new BadRequestExceptions("Cuenta no encontrada"));
+
+            AccountBank account = accountBankRepository.findById(accountId)
+                    .orElseThrow(() -> new ModelNotFoundException("Cuenta no Encontrada"));
+
+            if (account.getAccountStatus() != AccountStatus.ACTIVE) {
+                throw new BadRequestExceptions("La cuenta está inactiva");
+            }
             return new ActiveAccountResponseDto(
                     account.getNumber(),
                     account.getType().name(),
                     account.getAccountStatus().name(),
                     account.getBalance(),
                     account.getDateOfActivation() != null ? account.getDateOfActivation().toString() : "Fecha no disponible");
-        }catch (DataAccessException e){
-            throw new RuntimeException("erroro al traer balance de cuenta");
-        } catch (Exception e){
-          throw new  ServiceUnavailableCustomException("Error inesperado ");
         }
     }
 

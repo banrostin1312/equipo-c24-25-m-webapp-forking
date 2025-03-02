@@ -29,7 +29,6 @@ import java.util.List;
 public class AccountBankController {
 
     private final IAccountBankService accountBankService;
-    private final ITokenRepository tokenRepository;
 
 
     @Operation(summary = "Activar cuenta bancaria",
@@ -95,8 +94,8 @@ public class AccountBankController {
     }
 
 
-    @Operation(summary = "Ver saldo de una cuenta bancaria",
-            description = "Permite ver el saldo de una cuenta bancaria para un usuario autenticado.")
+    @Operation(summary = "Ver saldo de una cuenta bancaria activa",
+            description = "Permite ver el saldo de una cuenta bancaria activa para un usuario autenticado.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Peticion procesada exitosamente."),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta."),
