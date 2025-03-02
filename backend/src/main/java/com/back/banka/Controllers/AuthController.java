@@ -87,21 +87,6 @@ public class AuthController {
         return ResponseEntity.ok(tokenResponse);
     }
 
-
-    @Operation(summary = "Obtener todos los usuarios de la base de datos" +
-            "", description = "este endpoint permite obtener todos los usuarios registrados en la base de datos")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "datos obtenidos con exito"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
-    @GetMapping("/usuarios")
-     public ResponseEntity<List<GetAllUsersResponseDto>> getAllUsers(){
-        List<GetAllUsersResponseDto> getAllUser = this.authService.getAllUsers();
-        logger.info("Datos recuperadoso: ");
-        return ResponseEntity.status(HttpStatus.OK).body(getAllUser);
-
-     }
-
     @Operation(
             summary = "Cerrar sesión",
             description = "Cierra la sesión invalidando el token actual",

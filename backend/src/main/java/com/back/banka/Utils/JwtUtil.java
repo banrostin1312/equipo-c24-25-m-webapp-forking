@@ -32,7 +32,7 @@ public class JwtUtil {
                    long expiration,
                    @Value("${jwt.refresh-expiration}")
                    Long jwtRefreshExpirationTime,
-                   @Value(("jwt.reset-password-expiration"))
+                   @Value("${jwt.reset-password-expiration}")
                    long resetPasswordTokenExpirationTime
 
     ){
@@ -84,7 +84,7 @@ public class JwtUtil {
     }
 
     public String generateResetPasswordToken(String email){
-        return generateToken(email, expirationTime);
+        return generateToken(email, resetPasswordTokenExpirationTime);
     }
 
     public boolean isTokenValid(String token, UserDetails user) {

@@ -22,10 +22,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -64,7 +64,7 @@ public class AuthServiceImpl implements IAuthService {
      * @throws CustomAuthenticationException Si ocurre un error inesperado durante la autenticación.
      */
 
-
+    @Transactional
     @Override
     public TokenResponseDto authenticate(LoginRequestDto loginRequestDto) {
 
@@ -165,25 +165,4 @@ public class AuthServiceImpl implements IAuthService {
                 .build();
     }
 
-
-    @Override
-    public List<GetAllUsersResponseDto> getAllUsers() {
-        try {
-            List<User> allUsers = this.userRepository.findAll();
-
-            return allUsers.stream()
-                    .map(user -> GetAllUsersResponseDto.builder()
-                            .name(user.getName())
-                            .DNI(user.getDNI())
-                            .birthday(String.valueOf(user.getDateBirthDay()))
-                            .email(user.getEmail())
-                            .country(user.getCountry())
-                            .status(user.isStatus())
-                            .build())
-                    .collect(Collectors.toList());
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error al traer usuarios", e);
-        }
-    }
 }

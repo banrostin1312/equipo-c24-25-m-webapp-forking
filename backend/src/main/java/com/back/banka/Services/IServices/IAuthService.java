@@ -16,8 +16,4 @@ public interface IAuthService {
      * */
     TokenResponseDto authenticate(LoginRequestDto loginRequestDto);
     TokenResponseDto refreshToken(String authHeader);
-    List<GetAllUsersResponseDto> getAllUsers();
-
-
-
 }

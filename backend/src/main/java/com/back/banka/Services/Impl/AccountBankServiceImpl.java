@@ -31,6 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.naming.ServiceUnavailableException;
@@ -74,7 +75,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
     @Override
     public ActiveAccountResponseDto activeAccount(ActiveAccountRequestDto requestDto) {
 
-        try {
+
             String auth =  this.utilsService.getAuthenticatedUser();
 
             if (auth == null) {
@@ -99,17 +100,16 @@ public class AccountBankServiceImpl implements IAccountBankService {
             AccountBank create = createBankAccount(user, requestDto);
             AccountBank savedAccount = this.accountBankRepository.save(create);
 
-            this.utilsService.sendAccountNotification(
+          try{  this.utilsService.sendAccountNotification(
                     user,
                     "¡Confirmación de proceso de activacion de cuenta!",
                     "email-template",
                     "Tu cuenta ha sido activada . Gracias por acceder a nuestros servicios bancarios");
-            return buildAccountResponseDto(savedAccount);
-        } catch (DataAccessException e) {
-            throw new ServiceUnavailableCustomException("Error al intentar activar la cuenta. Intente más tarde.");
         } catch (Exception e) {
-            throw new RuntimeException("Error inesperado al activar la cuenta", e);
+            logger.error("Error inesperado al enviar correo: {}", e.getMessage(), e);
         }
+        return buildAccountResponseDto(savedAccount);
+
     }
 
     private void confirmData(ActiveAccountRequestDto requestDto) {
@@ -201,9 +201,10 @@ public class AccountBankServiceImpl implements IAccountBankService {
      * @throws BadRequestExceptions
      * @throws CustomAuthenticationException
      */
+    @Transactional
     @Override
     public DeactivateAccountResponseDto deactivateAccount(Long accountId) {
-       try {
+
            String username = this.utilsService.getAuthenticatedUser();
            if (username == null) {
                throw new InvalidCredentialExceptions("Usuario no Autenticado");
@@ -218,19 +219,19 @@ public class AccountBankServiceImpl implements IAccountBankService {
            accountBank.setAccountStatus(AccountStatus.INACTIVE);
            accountBank.setDateOfDeactivation(LocalDate.now());
            this.accountBankRepository.save(accountBank);
-           this.utilsService.sendAccountNotification(
+        try { this.utilsService.sendAccountNotification(
                    accountBank.getUser(),
                    "¡Tu cuenta ha sido Desactivada!",
                    "email-template",
                    "Tu cuenta bancaria ha sido desactivada con éxito. debes esperar 5 minutos habiles para activarla");
-           return buildDeactivateAccountResponseDto(accountBank);
-       }catch (DataAccessException e ){
-           throw new RuntimeException("Error al desactivar una cuenta", e);
-       } catch (Exception e){
-           throw new ServiceUnavailableCustomException("error inesperado al desactivar cuenta");
-       }
-    }
 
+       } catch (Exception e){
+            logger.error("error al enviar correo " + e.getMessage());
+       }
+        return buildDeactivateAccountResponseDto(accountBank);
+
+    }
+@Transactional(readOnly = true)
     @Override
     public List<GetAllAccountDto> getAllAccounts() {
         try {
@@ -270,9 +271,10 @@ public class AccountBankServiceImpl implements IAccountBankService {
      * @throws BadRequestExceptions
      * @throws CustomAuthenticationException
      */
+    @Transactional
     @Override
     public ReactivateAccountResponseDto reactiveAccount(Long accountId) {
-        try {
+
             String username = this.utilsService.getAuthenticatedUser();
             if (username == null) {
                 throw new InvalidCredentialExceptions("Usuario no Autenticado");
@@ -296,20 +298,20 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
             accountBank.setAccountStatus(AccountStatus.ACTIVE);
             accountBank.setDateOfReactivation(LocalDate.now());
+        try {
             this.utilsService.sendAccountNotification(
                     accountBank.getUser(),
                     "¡Tu cuenta ha sido reactivada!",
                     "email-template",
                     "Tu cuenta bancaria ha sido reactivada con éxito.");
             this.accountBankRepository.save(accountBank);
-            return buildReactivateAccountResponseDto(accountBank);
         } catch (InvalidCredentialExceptions | CustomAuthenticationException | BadRequestExceptions e) {
             throw e;
-        }catch (DataAccessException e){
-            throw new RuntimeException("error al reactivar cuenta, intente mas Tarde", e);
+
         } catch (Exception e){
-            throw  new ServiceUnavailableCustomException("error inesperado a l intentar reactivar cuenta");
+            logger.error("error al enviar correo {} ", e.getMessage());
         }
+        return buildReactivateAccountResponseDto(accountBank);
     }
 
     private DeactivateAccountResponseDto buildDeactivateAccountResponseDto(AccountBank accountBank) {
@@ -338,6 +340,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
 
     //Muestra el saldo en la cuenta
+    @Transactional(readOnly = true)
     @Override
     public ActiveAccountResponseDto getBalance(Long accountId) {
         try {
