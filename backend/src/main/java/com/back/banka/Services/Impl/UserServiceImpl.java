@@ -21,25 +21,26 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class UserServiceImpl implements IUserService {
     private final UserRepository   userRepository;
-    private final ITokenRepository tokenRepository;
     private  final IUtilsService utilsService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
-    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
-                           ITokenRepository tokenRepository,
                            IUtilsService utilsService,
-                           JwtUtil jwtUtil, PasswordEncoder passwordEncoder, UserDetailsServiceImpl userDetailsService) {
+                           JwtUtil jwtUtil,
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.tokenRepository = tokenRepository;
         this.utilsService = utilsService;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
-        this.userDetailsService = userDetailsService;
     }
 
+    /**
+     MEtodo para enviar correo para que el usaurio pueda cambiar su contraseña
+     el metodo recibe el username del usuario y envia una url al usuario para que pueda resetear su contraseña
+     @param email
+     **/
     @Override
     public void sentPasswordResetEmail(String email) {
         try {
@@ -59,23 +60,33 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
-
+/**
+MEtodo para actualizar la contraseña de un usuario en la base de datos.
+ Valida que el token sea enviado y lo compara con el que esta guardado en la base de datos
+ si el token es valido cambia la contraseña
+ @param requestDto
+ @return string
+**/
     @Override
     public String resetPassword(ResetPasswordRequestDto requestDto) {
 
-        String username = jwtUtil.extractEmail(requestDto.getToken());
+       try {
+           String username = jwtUtil.extractEmail(requestDto.getToken());
 
-        if (requestDto.getToken() == null || !jwtUtil.validateToken(requestDto.getToken())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token inválido");
-        }
+           if (requestDto.getToken() == null || !jwtUtil.validateToken(requestDto.getToken())) {
+               throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token inválido");
+           }
 
-        User user = this.userRepository.findByEmail(username).orElseThrow(()
-                -> new UsernameNotFoundException("Usuario no encontrado"));
+           User user = this.userRepository.findByEmail(username).orElseThrow(()
+                   -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
-        this.userRepository.save(user);
+           user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+           this.userRepository.save(user);
 
-        return "Contraseña actualizada correctamente";
+           return "Contraseña actualizada correctamente";
+       }catch (DataAccessException e){
+            throw new RuntimeException("Error al actulizar contraseña ", e);
+       }
     }
 
 
