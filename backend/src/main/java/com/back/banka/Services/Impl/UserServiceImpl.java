@@ -1,34 +1,43 @@
 package com.back.banka.Services.Impl;
-
 import com.back.banka.Dtos.RequestDto.ResetPasswordRequestDto;
-import com.back.banka.Model.Tokens;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.ITokenRepository;
 import com.back.banka.Repository.UserRepository;
 import com.back.banka.Services.IServices.IUserService;
 import com.back.banka.Utils.IUtilsService;
 import com.back.banka.Utils.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.support.HttpAccessor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements IUserService {
     private final UserRepository   userRepository;
     private final ITokenRepository tokenRepository;
     private  final IUtilsService utilsService;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            ITokenRepository tokenRepository,
                            IUtilsService utilsService,
-                           JwtUtil jwtUtil) {
+                           JwtUtil jwtUtil, PasswordEncoder passwordEncoder, UserDetailsServiceImpl userDetailsService) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.utilsService = utilsService;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -53,7 +62,20 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public String resetPassword(ResetPasswordRequestDto requestDto) {
-        return "";
+
+        String username = jwtUtil.extractEmail(requestDto.getToken());
+
+        if (requestDto.getToken() == null || !jwtUtil.validateToken(requestDto.getToken())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token inválido");
+        }
+
+        User user = this.userRepository.findByEmail(username).orElseThrow(()
+                -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+        this.userRepository.save(user);
+
+        return "Contraseña actualizada correctamente";
     }
 
 

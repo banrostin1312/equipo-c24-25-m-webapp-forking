@@ -32,15 +32,13 @@ public class AuthController {
 
     private final IAuthService authService;
     private final IRegisterService registerService;
-    private final IUserService userService;
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
 
     @Autowired
-     public AuthController (IAuthService authService, IRegisterService registerService, IUserService userService) {
+     public AuthController (IAuthService authService, IRegisterService registerService) {
         this.authService = authService;
          this.registerService = registerService;
-        this.userService = userService;
     }
 
     @Operation(summary = "Autenticar usuario", description = "Autentica un usuario con email y contraseña")
@@ -118,17 +116,5 @@ public class AuthController {
         return ResponseEntity.ok("Sesión cerrada correctamente");
     }
 
-
-    @Operation(
-            summary = "Restablecer contraseña",
-            description = "Envia correo de restablecimiento de contraseña"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "contraseña enviada correctamente")
-    })
-    public ResponseEntity<String> sentResetPassword(@RequestParam String username){
-        this.userService.sentPasswordResetEmail(username);
-        return ResponseEntity.status(HttpStatus.OK).body("Correo enviado correctamente");
-    }
 
 }
