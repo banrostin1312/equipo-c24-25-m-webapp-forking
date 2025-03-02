@@ -3,6 +3,7 @@ package com.back.banka.Services.Impl;
 import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
 import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
 import com.back.banka.Enums.Role;
+import com.back.banka.Exceptions.Custom.DniAlreadyExistsException;
 import com.back.banka.Exceptions.Custom.UserAlreadyExistsException;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.UserRepository;
@@ -30,6 +31,9 @@ public class RegisterServiceImpl implements IRegisterService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException("Correo ya registrado. Intenta iniciar sesión o ingresa un correo distinto.");
         }
+        if (userRepository.existsByDNI(request.getDNI())) {
+            throw new DniAlreadyExistsException("El DNI ya está registrado");
+        }
 
         User user = User.builder()
                 .name(request.getName())
@@ -45,13 +49,18 @@ public class RegisterServiceImpl implements IRegisterService {
         User savedUser = userRepository.save(user);
 
         Map<String, Object> emailVariables = new HashMap<>();
-        emailVariables.put("username", savedUser.getName());
+        emailVariables.put("name", savedUser.getName());
+        emailVariables.put("message", "Te has registrado con exito");
 
         try {
-            emailService.sendEmail(savedUser.getEmail(), "¡Bienvenido a Luma!", "welcome-email");
+            emailService.sendEmailTemplate(
+                    savedUser.getEmail(),
+                    "¡Bienvenido a Luma!", "register-confirmation",
+                    emailVariables);
         } catch (Exception e) {
             System.out.println("Error al enviar el correo: " + e.getMessage());
         }
+
         return RegisterResponseDto.builder()
                 .message("¡Registro Exitoso!")
                 .userId(savedUser.getId())

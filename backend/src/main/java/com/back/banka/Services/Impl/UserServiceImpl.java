@@ -1,171 +1,149 @@
 package com.back.banka.Services.Impl;
-import com.back.banka.Dtos.RequestDto.LoginRequestDto;
+import com.back.banka.Dtos.RequestDto.ResetPasswordRequestDto;
+import com.back.banka.Dtos.ResponseDto.GeneralResponseDto;
 import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
-import com.back.banka.Dtos.ResponseDto.TokenResponseDto;
-import com.back.banka.Enums.TokenType;
-import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
-import com.back.banka.Exceptions.Custom.InvalidCredentialExceptions;
-import com.back.banka.Model.Tokens;
+import com.back.banka.Exceptions.Custom.UserNotFoundException;
 import com.back.banka.Model.User;
-import com.back.banka.Repository.ITokenRepository;
 import com.back.banka.Repository.UserRepository;
+import com.back.banka.Services.IServices.IEmailService;
 import com.back.banka.Services.IServices.IUserService;
+import com.back.banka.Utils.IUtilsService;
 import com.back.banka.Utils.JwtUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service
 public class UserServiceImpl implements IUserService {
+    private final UserRepository   userRepository;
+    private  final IUtilsService utilsService;
+    private final IEmailService emailService;
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
-
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
-
-    private final UserRepository userRepository;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtUtil jwtService;
-    private final ITokenRepository tokenRepository;
-    private final UserDetailsServiceImpl userDetailsService;
-
-    public UserServiceImpl(UserRepository userRepository, AuthenticationManagerBuilder authenticationManagerBuilder, JwtUtil jwtService, ITokenRepository tokenRepository, UserDetailsServiceImpl userDetailsService) {
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,
+                           IUtilsService utilsService, IEmailService emailService,
+                           JwtUtil jwtUtil,
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.jwtService = jwtService;
-        this.tokenRepository = tokenRepository;
-        this.userDetailsService = userDetailsService;
+        this.utilsService = utilsService;
+        this.emailService = emailService;
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
-
     /**
-     * Método para autenticar un cliente.
-     * Este método realiza los siguientes pasos:
-     * Se crea el objeto de autenticación a partir de las credenciales proporcionadas (email y password)
-     * Se autentica el usuario usando el AuthenticationManager
-     * Se guarda la autenticación en el contexto de seguridad
-     * Si todo es exitoso, se genera un token JWT que será utilizado para futuras peticiones
-     *
-     * @param loginRequestDto
-     * @return LoginResponseDto
-     * @throws InvalidCredentialExceptions   Si las credenciales del usuario son incorrectas o el proceso de autenticación falla.
-     * @throws CustomAuthenticationException Si ocurre un error inesperado durante la autenticación.
-     */
-
-
+     MEtodo para enviar correo para que el usaurio pueda cambiar su contraseña
+     el metodo recibe el username del usuario y envia una url al usuario para que pueda resetear su contraseña
+     @param email
+     **/
     @Override
-    public TokenResponseDto authenticate(LoginRequestDto loginRequestDto) {
-
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(
-                        loginRequestDto.getEmail(),
-                        loginRequestDto.getPassword());
+    public void sendPasswordResetEmail(String email) {
         try {
-            Authentication authentication =
-                    authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            User user = this.userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
 
-            User user = userRepository.findByEmail(loginRequestDto.getEmail())
-                    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-            revokedUsersToken(user);
+            String tokenJwt = this.jwtUtil.generateResetPasswordToken(email);
+            String resetUrl = "https://equipo-c24-25-m-webapp-1.onrender.com/recuperar-contrasenia?token=" + tokenJwt;
 
-            String token = this.jwtService.generateAccessToken(loginRequestDto.getEmail());
-            String refreshToken = this.jwtService.generateRefreshToken(loginRequestDto.getEmail());
-            this.jwtService.diagnosticCheck(token);
-            logger.info("REfresh token generado");
-            saveUserToken(user, token);
-            return TokenResponseDto.builder()
-                    .token(token)
-                    .refreshToken(refreshToken)
-                    .build();
-        } catch (InvalidCredentialExceptions exceptions) {
-            throw new InvalidCredentialExceptions("Usuario o contraseña incorrectos");
-        } catch (CustomAuthenticationException e) {
-            throw new CustomAuthenticationException("Error de autenticacion");
-        } catch (AccessDeniedException exception) {
-            throw new AccessDeniedException(" acceso denegado");
+            this.utilsService.saveUserToken(user, tokenJwt);
+
+            Map<String, Object> emailVariables = new HashMap<>();
+            emailVariables.put("name", user.getName());
+            emailVariables.put("message", "Hola, " +
+                    "a través de este correo podrás configurar tu contraseña.");
+            emailVariables.put("resetUrl", resetUrl);
+            try {
+                this.emailService.sendEmailTemplate(
+                        user.getEmail(),
+                        "Hola, a través de este correo podrás configurar tu contraseña.",
+                        "reset-password",
+                        emailVariables
+                );
+            } catch (Exception e) {
+                log.error("Error al enviar el correo de restablecimiento de contraseña a {}: {}", email, e.getMessage(), e);
+            }
+
+        } catch (DataAccessException e) {
+            log.error("Error de base de datos al procesar la solicitud de restablecimiento de contraseña: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al procesar la solicitud. Intente más tarde.");
         }
-
     }
 
     /**
-     * Metodo para cambiar el estado de expired  y revoked a true
-     * busca estado false en las variable usando  con el id del usuario
-     * y lo cambia a true si esta en false
-     */
-    private void revokedUsersToken(User user) {
-        List<Tokens> validations =
-                this.tokenRepository.findAllIExpiredIsFalseOrRevokedIsFalseByUserId(user.getId());
-        if (!validations.isEmpty()) {
-            validations.forEach(token -> {
-                token.setRevoked(true);
-                token.setExpired(true);
+MEtodo para actualizar la contraseña de un usuario en la base de datos.
+ Valida que el token sea enviado y lo compara con el que esta guardado en la base de datos
+ si el token es valido cambia la contraseña
+ @param requestDto
+ @return string
+**/
+    @Transactional
+    @Override
+    public GeneralResponseDto resetPassword(ResetPasswordRequestDto requestDto) {
+        try {
+            log.info("Iniciando resetPassword para el token: " + requestDto.getToken());
+
+            String username = jwtUtil.extractEmail(requestDto.getToken());
+            if (username == null || username.isEmpty()) {
+                log.error("El email extraído es nulo o vacío");
+
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
+            }
+            log.info("Email extraído: " + username);
+
+            if (requestDto.getToken() == null || !jwtUtil.validateToken(requestDto.getToken())) {
+                log.error("Token inválido");
+
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
+            }
+
+            User user = userRepository.findByEmail(username).orElseThrow(() -> {
+                log.error("Usuario no encontrado para el email: " + username);
+
+                return new UsernameNotFoundException("Usuario no encontrado");
             });
-            tokenRepository.saveAll(validations);
+            log.info("Usuario encontrado: " + user.getEmail());
+
+            user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+            this.userRepository.save(user);
+            log.info("Contraseña actualizada correctamente");
+
+            try {
+                this.utilsService.sendAccountNotification(
+                        user,
+                        "Cambio de contraseña",
+                        "email-template",
+                        "Contraseña tu contraseña ha sido actualizada con exito" +
+                                "puedes entrar a tu aplicacion"
+                );
+            } catch (Exception e) {
+                log.error("Error al enviar correo", e);
+            }
+
+            return GeneralResponseDto.builder()
+                    .message("Contraseña actualizada con exito")
+                    .build();
+        } catch (Exception e) {
+            log.error("Error en resetPassword", e);
+            throw e;
         }
     }
 
-    /**
-     * guarda el token de un usurio en la base de datos
-     */
-    private void saveUserToken(User user, String token) {
-        Tokens tokenSaved = Tokens.builder()
-                .user(user)
-                .expired(false)
-                .revoked(false)
-                .token(token)
-                .tokenType(TokenType.BEARER)
-                .build();
-        this.tokenRepository.save(tokenSaved);
-    }
 
-    /**
-     * Metodo para refrescar un token
-     * valida si el refresh token es igual al que esta en la base de datos
-     * si es asi usa los metodos para generar un token, y refresh token
-     */
-    public TokenResponseDto refreshToken(String authHeader) {
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token inválido");
-        }
-
-        String refreshToken = authHeader.substring(7);
-        String username = jwtService.extractEmail(refreshToken);
-        logger.info("Usuario extraído del token: " + username);
-
-        if (username == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token inválido");
-        }
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-        if (!jwtService.isTokenValid(refreshToken, userDetails)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token inválido");
-        }
-
-        String accessToken = jwtService.generateAccessToken(userDetails.getUsername());
-        String refreshTokenNew = jwtService.generateRefreshToken(userDetails.getUsername());
-
-        return TokenResponseDto.builder()
-                .token(accessToken)
-                .refreshToken(refreshTokenNew)
-                .build();
-    }
-
-
+    @Transactional(readOnly = true)
     @Override
     public List<GetAllUsersResponseDto> getAllUsers() {
         try {

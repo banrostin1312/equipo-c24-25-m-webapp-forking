@@ -21,24 +21,54 @@ import java.util.Map;
 public class EmailServiceImpl implements IEmailService {
 
     private  final JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
 
     @Value("${mail.username}")
     private String mailUsername;
 
     @Override
-    public void sendEmail(String email, String subject, String body) {
-        //Enviar correo
+    public void sendEmail(String to, String subject, String content) {
+        try{
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true,StandardCharsets.UTF_8.name());
 
-            try{
-                MimeMessage message = javaMailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true);
-                helper.setFrom(mailUsername);
-                helper.setTo(email);
-                helper.setSubject(subject);
-                helper.setText(body, true);
-                javaMailSender.send(message);
-            } catch (MessagingException e){
-                throw new RuntimeException("Hubo un error al enviar el correo", e);
-            }
+            //Construcción del correo
+            helper.setFrom(mailUsername);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(content, true);
+
+            javaMailSender.send(message);
+        } catch (MessagingException e){
+            throw new RuntimeException("Hubo un error al enviar el correo", e);
+        }
+
+
+
+    }
+
+    public void sendEmailTemplate(String to, String subject, String templatename,Map<String,Object> variables ) {
+        try{
+            String content = renderTemplate(templatename, variables);
+
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true,StandardCharsets.UTF_8.name());
+
+            //Construcción del correo
+            helper.setFrom(mailUsername);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(content, true);
+
+            javaMailSender.send(message);
+        } catch (MessagingException e){
+            throw new RuntimeException("Hubo un error al enviar el correo", e);
+        }
+
+    }
+    private String renderTemplate(String templateName, Map<String, Object> variables) {
+        Context context = new Context();
+        context.setVariables(variables);
+        return templateEngine.process(templateName, context);
     }
 }
