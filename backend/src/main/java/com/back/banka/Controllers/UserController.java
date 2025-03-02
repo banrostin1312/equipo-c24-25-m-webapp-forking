@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,9 @@ public class UserController {
 
     @Operation(
             summary = "Restablecer contraseña",
-            description = "Envia correo de restablecimiento de contraseña"
+            description = "Envia correo de restablecimiento de contraseña este correo contiene la url donde se puede restablecer la contraseña" +
+                    "cuando un usuario da click alli debe ser redirigido a un formulario en el front donde pueda poner su nueva contraseña" +
+                    "el front debe capturar la url y extraer el token que debe enviar por body junto a la nueva contraseña"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "contraseña enviada correctamente")
@@ -35,20 +38,23 @@ public class UserController {
     @PostMapping("/token-contraseña/{username}")
     public ResponseEntity<String> sentResetPassword(
             @RequestParam String username){
-        this.userService.sentPasswordResetEmail(username);
+        this.userService.sendPasswordResetEmail(username);
         return ResponseEntity.status(HttpStatus.OK).body("Correo de restablecimiento enviado correctamente");
     }
     @Operation(
             summary = "Metodo para actualiazar la contraseña",
-            description = "Luego de que el correo de restablecimiento es enviado, el usuario puede cambiar su contraseña a través de este endpoint"
+            description = "Luego de que el correo de restablecimiento es enviado, " +
+                    "el usuario puede cambiar su contraseña a través de este endpoint"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "contraseña cambiada correctamente"),
             @ApiResponse(responseCode = "400", description = "request erroneo")
     })
-    @PostMapping("/recuperar-contraseña")
+    @PostMapping("/recuperar-contrasenia")
     public ResponseEntity<String> resetPassword(@Valid  @RequestBody ResetPasswordRequestDto requestDto){
-         return ResponseEntity.status(HttpStatus.OK).body("Contraseña restablecida correctamente");
+        log.info("Recibiendo solicitud de recuperación de contraseña: " + requestDto);
+        String response = this.userService.resetPassword(requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 

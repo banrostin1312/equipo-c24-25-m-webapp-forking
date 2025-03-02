@@ -7,7 +7,7 @@ import com.back.banka.Model.User;
 import java.util.List;
 
 public interface IUserService {
-    void sentPasswordResetEmail(String email);
+    void sendPasswordResetEmail(String email);
     String resetPassword(ResetPasswordRequestDto requestDto);
     List<GetAllUsersResponseDto> getAllUsers();
 }

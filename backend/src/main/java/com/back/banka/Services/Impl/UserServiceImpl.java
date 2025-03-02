@@ -49,65 +49,90 @@ public class UserServiceImpl implements IUserService {
      @param email
      **/
     @Override
-    public void sentPasswordResetEmail(String email) {
+    public void sendPasswordResetEmail(String email) {
         try {
-            User user = this.userRepository.findByEmail(email).orElseThrow(()
-                    -> new UsernameNotFoundException("Usuario no encotrado"));
+            User user = this.userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
             String tokenJwt = this.jwtUtil.generateResetPasswordToken(email);
-            String resetUrl = "https://equipo-c24-25-m-webapp-1.onrender.com/recuperar-contraseña?token=" + tokenJwt;
+            String resetUrl = "https://equipo-c24-25-m-webapp-1.onrender.com/recuperar-contrasenia?token=" + tokenJwt;
+
+            this.utilsService.saveUserToken(user, tokenJwt);
 
             Map<String, Object> emailVariables = new HashMap<>();
             emailVariables.put("name", user.getName());
             emailVariables.put("message", "Hola, a través de este correo podrás configurar tu contraseña.");
             emailVariables.put("resetUrl", resetUrl);
+            try {
+                this.emailService.sendEmailTemplate(
+                        user.getEmail(),
+                        "Hola, a través de este correo podrás configurar tu contraseña.",
+                        "reset-password",
+                        emailVariables
+                );
+            } catch (Exception e) {
+                log.error("Error al enviar el correo de restablecimiento de contraseña a {}: {}", email, e.getMessage(), e);
+            }
 
-            this.utilsService.saveUserToken(user, tokenJwt);
-            this.emailService.sendEmailTemplate(
-                    user.getEmail(),
-                    "Hola, a través de este correo podrás configurar tu contraseña.",
-                    "reset-password",
-                    emailVariables     );
-
-        }catch (DataAccessException e){
-            throw new RuntimeException("Error al procesar la solicitud", e);
+        } catch (DataAccessException e) {
+            log.error("Error de base de datos al procesar la solicitud de restablecimiento de contraseña: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al procesar la solicitud. Intente más tarde.");
         }
     }
 
-/**
+    /**
 MEtodo para actualizar la contraseña de un usuario en la base de datos.
  Valida que el token sea enviado y lo compara con el que esta guardado en la base de datos
  si el token es valido cambia la contraseña
  @param requestDto
  @return string
 **/
-@Transactional
+    @Transactional
     @Override
     public String resetPassword(ResetPasswordRequestDto requestDto) {
+        try {
+            log.info("Iniciando resetPassword para el token: " + requestDto.getToken());
 
+            String username = jwtUtil.extractEmail(requestDto.getToken());
+            if (username == null || username.isEmpty()) {
+                log.error("El email extraído es nulo o vacío");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
+            }
+            log.info("Email extraído: " + username);
 
-           String username = jwtUtil.extractEmail(requestDto.getToken());
+            if (requestDto.getToken() == null || !jwtUtil.validateToken(requestDto.getToken())) {
+                log.error("Token inválido");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
+            }
 
-           if (requestDto.getToken() == null || !jwtUtil.validateToken(requestDto.getToken())) {
-               throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token inválido");
-           }
+            User user = userRepository.findByEmail(username).orElseThrow(() -> {
+                log.error("Usuario no encontrado para el email: " + username);
+                return new UsernameNotFoundException("Usuario no encontrado");
+            });
+            log.info("Usuario encontrado: " + user.getEmail());
 
-           User user = this.userRepository.findByEmail(username).orElseThrow(()
-                   -> new UsernameNotFoundException("Usuario no encontrado"));
+            user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+            this.userRepository.save(user);
+            log.info("Contraseña actualizada correctamente");
 
-           user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
-           this.userRepository.save(user);
-    try {   this.utilsService.sendAccountNotification(
-            user,
-                 "Cambio de contraseña",
-            "reset-password",
-            "Contraseña actualizada"
-    );
-       }catch (Exception e){
-        log.error("Error al enviar correo");
-       }
-    return "Contraseña actualizada correctamente";
-}
+            try {
+                this.utilsService.sendAccountNotification(
+                        user,
+                        "Cambio de contraseña",
+                        "reset-password",
+                        "Contraseña actualizada"
+                );
+            } catch (Exception e) {
+                log.error("Error al enviar correo", e);
+            }
+
+            return "Contraseña actualizada correctamente";
+        } catch (Exception e) {
+            log.error("Error en resetPassword", e);
+            throw e;
+        }
+    }
+
 
     @Transactional(readOnly = true)
     @Override

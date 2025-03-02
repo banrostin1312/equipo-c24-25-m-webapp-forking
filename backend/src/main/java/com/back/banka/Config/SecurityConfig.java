@@ -73,6 +73,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests( auth ->
 
                         auth.requestMatchers("/api/banca/auth/**",
+                                        "/api/banca/users/**",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
                                         "/v2/api-docs",
@@ -80,7 +81,6 @@ public class SecurityConfig {
                                         "/v3/api-docs/swagger-config"
                                         ).permitAll()
                                 .requestMatchers("/api/banca/cuenta-bancaria/**").hasRole("CLIENT")
-                                .requestMatchers("/api/banca/users/**").permitAll()
                         .anyRequest().authenticated())
 
                 .exceptionHandling(exception ->

@@ -3,12 +3,10 @@ package com.back.banka.Controllers;
 
 import com.back.banka.Dtos.RequestDto.LoginRequestDto;
 import com.back.banka.Dtos.RequestDto.RegisterRequestDto;
-import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
 import com.back.banka.Dtos.ResponseDto.TokenResponseDto;
 import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
 import com.back.banka.Services.IServices.IRegisterService;
 import com.back.banka.Services.IServices.IAuthService;
-import com.back.banka.Services.IServices.IUserService;
 import com.back.banka.Utils.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController

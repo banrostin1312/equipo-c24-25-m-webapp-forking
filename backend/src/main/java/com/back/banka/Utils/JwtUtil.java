@@ -4,6 +4,7 @@ import com.back.banka.Model.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +16,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 public class JwtUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     private final Key key;
     private final long expirationTime;
@@ -46,23 +47,23 @@ public class JwtUtil {
 
     public void diagnosticCheck(String token) {
         try {
-            logger.info("Clave actual (Base64): {}",
+            log.info("Clave actual (Base64): {}",
                     java.util.Base64.getEncoder().encodeToString(this.key.getEncoded()));
 
             Claims claims = getClaims(token);
-            logger.info("Token verificado exitosamente");
-            logger.info("Email en token: {}", claims.getSubject());
-            logger.info("Fecha de emisión: {}", claims.getIssuedAt());
-            logger.info("Fecha de expiración: {}", claims.getExpiration());
+            log.info("Token verificado exitosamente");
+            log.info("Email en token: {}", claims.getSubject());
+            log.info("Fecha de emisión: {}", claims.getIssuedAt());
+            log.info("Fecha de expiración: {}", claims.getExpiration());
 
         } catch (ExpiredJwtException e) {
-            logger.error("Token expirado: {}", e.getMessage());
+            log.error("Token expirado: {}", e.getMessage());
         } catch (SignatureException e) {
-            logger.error("Error en la firma del token: {}", e.getMessage());
+            log.error("Error en la firma del token: {}", e.getMessage());
         } catch (MalformedJwtException e) {
-            logger.error("Token mal formado: {}", e.getMessage());
+            log.error("Token mal formado: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Error inesperado en verificación: {}", e.getMessage(), e);
+            log.error("Error inesperado en verificación: {}", e.getMessage(), e);
         }
     }
 
@@ -90,7 +91,7 @@ public class JwtUtil {
     public boolean isTokenValid(String token, UserDetails user) {
         final String username = extractEmail(token);
         if (username == null) {
-            logger.warn("No se pudo extraer el email del token.");
+            log.warn("No se pudo extraer el email del token.");
             return false;
         }
         return (username.equals(user.getUsername()) && !isTokenExpired(token));
@@ -114,10 +115,8 @@ public class JwtUtil {
         try{
             getClaims(token);
             return true;
-        } catch (ExpiredJwtException e){
-            System.out.println("Token expirado:" + e.getMessage());
         } catch (JwtException e){
-            System.out.println("Token Inválido" + e.getMessage());
+            log.error("Token invalido {}", e.getMessage());
         }
         return false;
     }
