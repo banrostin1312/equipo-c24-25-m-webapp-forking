@@ -10,4 +10,5 @@ public interface IUtilsService{
     String getAuthenticatedUser();
     void sendAccountNotification(User user, String subject, String
             templateName, String message);
+    void saveUserToken(User user, String token);
 }

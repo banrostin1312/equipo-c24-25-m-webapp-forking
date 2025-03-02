@@ -1,9 +1,12 @@
 package com.back.banka.Utils;
 
+import com.back.banka.Enums.TokenType;
 import com.back.banka.Exceptions.Custom.BadRequestExceptions;
 import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Model.AccountBank;
+import com.back.banka.Model.Tokens;
 import com.back.banka.Model.User;
+import com.back.banka.Repository.ITokenRepository;
 import com.back.banka.Services.IServices.IEmailService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,6 +25,7 @@ import java.util.Map;
 public class UtilsServiceImpl implements IUtilsService {
 
     private final IEmailService emailService;
+    private final ITokenRepository tokenRepository;
 
 
     @Override
@@ -86,5 +90,17 @@ public class UtilsServiceImpl implements IUtilsService {
                 templateName,
                 emailVariables
         );
+    }
+
+    @Override
+    public void saveUserToken(User user, String token) {
+        Tokens tokenSaved = Tokens.builder()
+                .user(user)
+                .expired(false)
+                .revoked(false)
+                .token(token)
+                .tokenType(TokenType.BEARER)
+                .build();
+        this.tokenRepository.save(tokenSaved);
     }
 }

@@ -7,6 +7,7 @@ import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
 import com.back.banka.Dtos.ResponseDto.TokenResponseDto;
 import com.back.banka.Dtos.ResponseDto.RegisterResponseDto;
 import com.back.banka.Services.IServices.IRegisterService;
+import com.back.banka.Services.IServices.IAuthService;
 import com.back.banka.Services.IServices.IUserService;
 import com.back.banka.Utils.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,17 +30,18 @@ import java.util.List;
 @RequestMapping("/api/banca/auth")
 public class AuthController {
 
-    private final IUserService userService;
+    private final IAuthService authService;
     private final IRegisterService registerService;
+    private final IUserService userService;
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
 
     @Autowired
-     public AuthController (IUserService userService, IRegisterService registerService) {
-         this.userService = userService;
+     public AuthController (IAuthService authService, IRegisterService registerService, IUserService userService) {
+        this.authService = authService;
          this.registerService = registerService;
-
-     }
+        this.userService = userService;
+    }
 
     @Operation(summary = "Autenticar usuario", description = "Autentica un usuario con email y contraseña")
     @ApiResponses(value = {
@@ -50,7 +52,7 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> authenticateUser (@Valid  @RequestBody LoginRequestDto requestDto){
-        TokenResponseDto loginResponseDto = this.userService.authenticate(requestDto);
+        TokenResponseDto loginResponseDto = this.authService.authenticate(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDto);
     }
 
@@ -83,7 +85,7 @@ public class AuthController {
             @RequestHeader(name = "Authorization", required = false) String authHeader) {
         logger.info("Authorization Header recibido: " + authHeader);
 
-        TokenResponseDto tokenResponse = userService.refreshToken(authHeader);
+        TokenResponseDto tokenResponse = authService.refreshToken(authHeader);
         return ResponseEntity.ok(tokenResponse);
     }
 
@@ -96,7 +98,7 @@ public class AuthController {
     })
     @GetMapping("/usuarios")
      public ResponseEntity<List<GetAllUsersResponseDto>> getAllUsers(){
-        List<GetAllUsersResponseDto> getAllUser = this.userService.getAllUsers();
+        List<GetAllUsersResponseDto> getAllUser = this.authService.getAllUsers();
         logger.info("Datos recuperadoso: ");
         return ResponseEntity.status(HttpStatus.OK).body(getAllUser);
 
@@ -114,6 +116,19 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         return ResponseEntity.ok("Sesión cerrada correctamente");
+    }
+
+
+    @Operation(
+            summary = "Restablecer contraseña",
+            description = "Envia correo de restablecimiento de contraseña"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "contraseña enviada correctamente")
+    })
+    public ResponseEntity<String> sentResetPassword(@RequestParam String username){
+        this.userService.sentPasswordResetEmail(username);
+        return ResponseEntity.status(HttpStatus.OK).body("Correo enviado correctamente");
     }
 
 }

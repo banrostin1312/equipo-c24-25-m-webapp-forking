@@ -23,6 +23,7 @@ public class JwtUtil {
     private final Key key;
     private final long expirationTime;
     private final Long jwtRefreshExpirationTime;
+    private final long resetPasswordTokenExpirationTime;
 
 
     public JwtUtil(@Value("${jwt.secret}")
@@ -30,9 +31,12 @@ public class JwtUtil {
                    @Value("${jwt.expiration}")
                    long expiration,
                    @Value("${jwt.refresh-expiration}")
-                   Long jwtRefreshExpirationTime
+                   Long jwtRefreshExpirationTime,
+                   @Value(("jwt.reset-password-expiration"))
+                   long resetPasswordTokenExpirationTime
 
     ){
+        this.resetPasswordTokenExpirationTime = resetPasswordTokenExpirationTime;
 
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         this.key = Keys.hmacShaKeyFor(keyBytes); //Generando clave con HS256
@@ -79,7 +83,9 @@ public class JwtUtil {
         return generateToken(email, expirationTime);
     }
 
-
+    public String generateResetPasswordToken(String email){
+        return generateToken(email, expirationTime);
+    }
 
     public boolean isTokenValid(String token, UserDetails user) {
         final String username = extractEmail(token);

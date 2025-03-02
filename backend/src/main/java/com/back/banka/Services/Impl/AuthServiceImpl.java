@@ -9,7 +9,7 @@ import com.back.banka.Model.Tokens;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.ITokenRepository;
 import com.back.banka.Repository.UserRepository;
-import com.back.banka.Services.IServices.IUserService;
+import com.back.banka.Services.IServices.IAuthService;
 import com.back.banka.Utils.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class AuthServiceImpl implements IUserService {
+public class AuthServiceImpl implements IAuthService {
 
 
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
