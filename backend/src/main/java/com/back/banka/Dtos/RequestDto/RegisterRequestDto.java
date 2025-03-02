@@ -30,8 +30,8 @@ public class RegisterRequestDto {
     @NotBlank(message = "Campo obligatorio")
     private String country;
     @NotBlank(message = "Campo obligatorio")
-    @Size(min = 8, max = 8, message = "El DNI debe tener exactamente 8 caracteres")
-    @Pattern(regexp = "\\d{8}", message = "El DNI debe contener solo números")
+    @Pattern(regexp = "^\\d{8}$", message = "El DNI debe contener solo números " +
+            "y tener exactamente 8 dígitos")
     @Column(name = "dni", nullable = false, unique = true)
     private String DNI;
 
