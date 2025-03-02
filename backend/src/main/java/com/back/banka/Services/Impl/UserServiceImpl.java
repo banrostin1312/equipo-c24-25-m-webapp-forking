@@ -1,5 +1,6 @@
 package com.back.banka.Services.Impl;
 import com.back.banka.Dtos.RequestDto.ResetPasswordRequestDto;
+import com.back.banka.Dtos.ResponseDto.GeneralResponseDto;
 import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
 import com.back.banka.Exceptions.Custom.UserNotFoundException;
 import com.back.banka.Model.User;
@@ -91,7 +92,7 @@ MEtodo para actualizar la contraseña de un usuario en la base de datos.
 **/
     @Transactional
     @Override
-    public String resetPassword(ResetPasswordRequestDto requestDto) {
+    public GeneralResponseDto resetPassword(ResetPasswordRequestDto requestDto) {
         try {
             log.info("Iniciando resetPassword para el token: " + requestDto.getToken());
 
@@ -124,14 +125,17 @@ MEtodo para actualizar la contraseña de un usuario en la base de datos.
                 this.utilsService.sendAccountNotification(
                         user,
                         "Cambio de contraseña",
-                        "reset-password",
-                        "Contraseña actualizada"
+                        "email-template",
+                        "Contraseña tu contraseña ha sido actualizada con exito" +
+                                "puedes entrar a tu aplicacion"
                 );
             } catch (Exception e) {
                 log.error("Error al enviar correo", e);
             }
 
-            return "Contraseña actualizada correctamente";
+            return GeneralResponseDto.builder()
+                    .message("Contraseña actualizada con exito")
+                    .build();
         } catch (Exception e) {
             log.error("Error en resetPassword", e);
             throw e;

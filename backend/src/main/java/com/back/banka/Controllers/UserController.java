@@ -1,6 +1,7 @@
 package com.back.banka.Controllers;
 
 import com.back.banka.Dtos.RequestDto.ResetPasswordRequestDto;
+import com.back.banka.Dtos.ResponseDto.GeneralResponseDto;
 import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
 import com.back.banka.Services.IServices.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,9 +53,9 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "request erroneo")
     })
     @PostMapping("/recuperar-contrasenia")
-    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequestDto requestDto){
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequestDto requestDto){
         log.info("Recibiendo solicitud de recuperación de contraseña: " + requestDto);
-        String response = this.userService.resetPassword(requestDto);
+        GeneralResponseDto response = this.userService.resetPassword(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
