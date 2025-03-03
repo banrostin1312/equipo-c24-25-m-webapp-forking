@@ -11,4 +11,8 @@ public interface IUserService {
     void sendPasswordResetEmail(String email);
     GeneralResponseDto resetPassword(ResetPasswordRequestDto requestDto);
     List<GetAllUsersResponseDto> getAllUsers();
+
+    User getAuthenticatedUser(); //Metodo para obtener el usuario autenticado
 }
+
+
