@@ -1,7 +1,10 @@
 package com.back.banka.Services.Impl;
 import com.back.banka.Dtos.RequestDto.ResetPasswordRequestDto;
+import com.back.banka.Dtos.RequestDto.UpdateUserRequestDto;
 import com.back.banka.Dtos.ResponseDto.GeneralResponseDto;
 import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
+import com.back.banka.Dtos.ResponseDto.UpdateUserResponseDto;
+import com.back.banka.Exceptions.Custom.DniAlreadyExistsException;
 import com.back.banka.Exceptions.Custom.UserNotFoundException;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.UserRepository;
@@ -9,6 +12,7 @@ import com.back.banka.Services.IServices.IEmailService;
 import com.back.banka.Services.IServices.IUserService;
 import com.back.banka.Utils.IUtilsService;
 import com.back.banka.Utils.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -17,11 +21,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -162,6 +168,49 @@ MEtodo para actualizar la contraseña de un usuario en la base de datos.
 
         } catch (Exception e) {
             throw new RuntimeException("Error al traer usuarios", e);
+        }
+    }
+
+/**
+Método que permite a un usuario modificar su información personal.
+ **/
+    @Transactional
+    public UpdateUserResponseDto updateUser(Long id, UpdateUserRequestDto request){
+        try{
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "El correo electrónico ya está registrado."
+                );
+            }
+
+            if (userRepository.existsByDNI(request.getDNI())) {
+                throw new DniAlreadyExistsException("El DNI ya está registrado.");
+            }
+
+            Optional<User> userOptional = userRepository.findById(id);
+
+
+        User user = userOptional.orElseThrow(() ->
+                new UserNotFoundException("Usuario no encontrado"));
+
+
+        user.setName(request.getName());
+        user.setDNI(request.getDNI());
+        user.setEmail(request.getEmail());
+            if (request.getDateBirthDay() == null) {
+                throw new IllegalArgumentException("Fecha no disponible");
+            }
+            user.setDateBirthDay(request.getDateBirthDay());
+
+            userRepository.save(user);
+
+            return new UpdateUserResponseDto(
+                    user.getName(),
+                    user.getDNI(),
+                    user.getEmail(),
+                    user.getDateBirthDay());
+        } catch (Exception e) {
+            throw new RuntimeException("Error interno del servidor", e);
         }
     }
 }

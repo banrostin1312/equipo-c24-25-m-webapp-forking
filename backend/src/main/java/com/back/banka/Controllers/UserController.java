@@ -1,9 +1,13 @@
 package com.back.banka.Controllers;
 
 import com.back.banka.Dtos.RequestDto.ResetPasswordRequestDto;
+import com.back.banka.Dtos.RequestDto.UpdateUserRequestDto;
 import com.back.banka.Dtos.ResponseDto.GeneralResponseDto;
 import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
+import com.back.banka.Dtos.ResponseDto.UpdateUserResponseDto;
+import com.back.banka.Model.User;
 import com.back.banka.Services.IServices.IUserService;
+import com.back.banka.Services.Impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,11 +24,13 @@ import java.util.List;
 @RequestMapping("/api/banca/users")
 public class UserController {
      private final IUserService userService;
+     private final UserServiceImpl userServiceImpl;
 
      @Autowired
     public UserController(
-            IUserService userService) {
+            IUserService userService, UserServiceImpl userServiceImpl) {
         this.userService = userService;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @Operation(
@@ -72,6 +78,12 @@ public class UserController {
         log.info("Datos recuperadoso: ");
         return ResponseEntity.status(HttpStatus.OK).body(getAllUser);
 
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdateUserResponseDto> updateUser (@PathVariable Long id, @Valid @RequestBody UpdateUserRequestDto request){
+         UpdateUserResponseDto updatedUser = userServiceImpl.updateUser(id, request);
+         return ResponseEntity.ok(updatedUser);
     }
 
 }
