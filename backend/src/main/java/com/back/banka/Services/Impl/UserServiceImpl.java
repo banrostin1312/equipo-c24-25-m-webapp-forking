@@ -165,8 +165,4 @@ MEtodo para actualizar la contraseña de un usuario en la base de datos.
         }
     }
 
-    @Override
-    public User getAuthenticatedUser() {
-        return null;
-    }
 }
