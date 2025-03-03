@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Banco LUMA</title>
+    <title>¡Registro Exitoso en Banco LUMA!</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -10,6 +10,7 @@
             margin: 0;
             padding: 0;
         }
+
         .container {
             width: 100%;
             max-width: 600px;
@@ -19,62 +20,63 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .header {
             text-align: center;
             padding: 20px;
             border-bottom: 2px solid #007bff;
         }
+
         .header img {
             max-width: 150px;
         }
+
         .content {
             padding: 20px;
             text-align: center;
         }
+
         .content h1 {
             color: #008000;
         }
+
         .content p {
             font-size: 16px;
             color: #555;
             line-height: 1.5;
         }
-        .button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 20px;
-            background-color: #008000;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
+
+        .highlight {
             font-weight: bold;
-            font-size: 16px;
+            color: #007bff;
         }
-        .button:hover {
-            background-color: #006400;
-        }
+
         .footer {
             text-align: center;
             padding: 15px;
             font-size: 12px;
             color: #777;
         }
-        .highlight {
-            font-weight: bold;
-            color: #007bff;
-        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <!-- <img src="https://yourbanklogo.com/logo.png" alt="Banco LUMA" th:src="@{https://yourbanklogo.com/logo.png}"> -->
+        <!-- <img src="https://yourbanklogo.com/logo.png" alt="Banco LUMA"> -->
     </div>
 
     <div class="content">
-        <h1>Banca Virtual LUMA</h1>
+        <h1>¡Bienvenido a Banco LUMA!</h1>
         <p>Hola, <span class="highlight" th:text="${name}"></span>.</p>
         <p th:text="${message}"></p>
+        <p>Tu registro se ha completado con éxito. Ahora puedes disfrutar de todos los servicios que Banco LUMA tiene para ti.</p>
+        <p>
+            <strong>¿Qué puedes hacer ahora?</strong><br>
+            ✅ Activar hasta dos cuentas de ahorro sin cuota de manejo.<br>
+            ✅ Gestionar tus finanzas de manera fácil y segura.<br>
+            ✅ Disfrutar de la mejor experiencia en banca digital.
+        </p>
+        <p>En Banco LUMA, todo es <span class="highlight">fácil y cool</span>. 🚀</p>
     </div>
 
     <div class="footer">
