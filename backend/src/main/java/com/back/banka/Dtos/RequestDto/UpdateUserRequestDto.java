@@ -10,13 +10,11 @@ import java.time.LocalDate;
 
 @Data
 public class UpdateUserRequestDto {
-    @NotBlank(message = "El nombre no puede ser nulo")
+
     private String name;
-    @NotBlank(message = "El DNI no puede ser nulo")
+
     private String DNI;
-    @NotBlank(message = "El email no puede ir vacío")
-    @Email
+    @Email(message = "Formato invalido")
     private String email;
-    @NotNull
     private LocalDate dateBirthDay;
 }

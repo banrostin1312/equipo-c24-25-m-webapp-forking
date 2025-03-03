@@ -175,6 +175,7 @@ MEtodo para actualizar la contraseña de un usuario en la base de datos.
 Método que permite a un usuario modificar su información personal.
  **/
     @Transactional
+    @Override
     public UpdateUserResponseDto updateUser(Long id, UpdateUserRequestDto request){
         try{
             if (userRepository.existsByEmail(request.getEmail())) {

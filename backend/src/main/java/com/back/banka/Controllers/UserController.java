@@ -24,13 +24,11 @@ import java.util.List;
 @RequestMapping("/api/banca/users")
 public class UserController {
      private final IUserService userService;
-     private final UserServiceImpl userServiceImpl;
 
      @Autowired
     public UserController(
             IUserService userService, UserServiceImpl userServiceImpl) {
         this.userService = userService;
-        this.userServiceImpl = userServiceImpl;
     }
 
     @Operation(
@@ -80,9 +78,9 @@ public class UserController {
 
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<UpdateUserResponseDto> updateUser (@PathVariable Long id, @Valid @RequestBody UpdateUserRequestDto request){
-         UpdateUserResponseDto updatedUser = userServiceImpl.updateUser(id, request);
+         UpdateUserResponseDto updatedUser = userService.updateUser(id, request);
          return ResponseEntity.ok(updatedUser);
     }
 
