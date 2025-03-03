@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 @Data
 public class TransactionRequestDto {
-    private String senderAccountNumber;
     private String receiverAccountNumber;
     private BigDecimal amount;
     private LocalDateTime transactionDate;

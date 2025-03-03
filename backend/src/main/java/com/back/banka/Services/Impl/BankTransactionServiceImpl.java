@@ -1,15 +1,20 @@
 package com.back.banka.Services.Impl;
 
+import com.back.banka.Dtos.ResponseDto.SendMoneyResponseDto;
 import com.back.banka.Dtos.RequestDto.TransactionHistoryRequestDto;
 import com.back.banka.Dtos.RequestDto.TransactionRequestDto;
+import com.back.banka.Dtos.ResponseDto.DeactivateAccountResponseDto;
 import com.back.banka.Enums.AccountStatus;
 import com.back.banka.Enums.StatusTransactions;
 import com.back.banka.Enums.TransactionType;
+import com.back.banka.Exceptions.Custom.BadRequestExceptions;
+import com.back.banka.Exceptions.Custom.UserNotFoundException;
 import com.back.banka.Model.AccountBank;
 import com.back.banka.Model.BankTransaction;
 import com.back.banka.Repository.BankTransactionRepository;
 import com.back.banka.Repository.IAccountBankRepository;
 ;
+import com.back.banka.Services.IServices.BankTransactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,47 +22,50 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class BankTransactionServiceImpl {
+public class BankTransactionServiceImpl implements BankTransactionService {
 
     private final BankTransactionRepository transactionRepository;
     private final IAccountBankRepository accountBankRepository;
     private final EmailServiceImpl emailService;
 
     @Transactional
-    public ResponseEntity<String> sendMoney(TransactionRequestDto requestDto){
-        Optional<AccountBank> senderOpt = accountBankRepository.findByNumber(requestDto.getSenderAccountNumber());
-        Optional<AccountBank> receiverOpt = accountBankRepository.findByNumber(requestDto.getReceiverAccountNumber());
+    public SendMoneyResponseDto sendMoney(Long accountId, TransactionRequestDto requestDto){
+        
+        AccountBank senderOpt = accountBankRepository.findById(accountId).orElseThrow(()
+                -> new UserNotFoundException("Cuenta de envio no encontrada"));
+        AccountBank receiver = accountBankRepository.findByNumber(requestDto.getReceiverAccountNumber())
+                .orElseThrow(() -> new UserNotFoundException("Cuenta receptora no encontrada"));
 
-        if(senderOpt.isEmpty() || receiverOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("La cuenta del remitente o destinatario no se ha encontrado");
+        if (senderOpt.getNumber().equals(receiver.getNumber())) {
+            throw new BadRequestExceptions("No puedes transferirte dinero a ti mismo.");
         }
 
-        AccountBank sender = senderOpt.get();
-        AccountBank receiver = receiverOpt.get();
-
-        if (sender.getAccountStatus() != AccountStatus.ACTIVE || receiver.getAccountStatus() != AccountStatus.ACTIVE) {
-            return ResponseEntity.badRequest().body("Una o ambas cuentas están inactivas");
+        if (senderOpt.getAccountStatus() != AccountStatus.ACTIVE || receiver.getAccountStatus() != AccountStatus.ACTIVE) {
+            throw new  BadRequestExceptions("Una o ambas cuentas están inactivas");
         }
         if (requestDto.getAmount().compareTo(BigDecimal.ZERO) <= 0){
-            return ResponseEntity.badRequest().body("El monto de la transferencia debe ser mayor a cero");
+            throw new  BadRequestExceptions("El monto de la transferencia debe ser mayor a cero");
         }
-        if (sender.getBalance().compareTo(requestDto.getAmount()) < 0){
-            return ResponseEntity.badRequest().body("Saldo insuficiente.");
+        if (senderOpt.getBalance().compareTo(requestDto.getAmount()) < 0){
+            throw new  BadRequestExceptions("Saldo insuficiente.");
         }
-        sender.setBalance(sender.getBalance().subtract(requestDto.getAmount()));
+        senderOpt.setBalance(senderOpt.getBalance().subtract(requestDto.getAmount()));
         receiver.setBalance(receiver.getBalance().add(requestDto.getAmount()));
 
-        accountBankRepository.save(sender);
+        accountBankRepository.save(senderOpt);
         accountBankRepository.save(receiver);
 
         BankTransaction transaction = BankTransaction.builder()
-                .accountSend(sender)
+                .accountSend(senderOpt)
                 .accountReceiving(receiver)
                 .amount(requestDto.getAmount())
                 .transactionType(TransactionType.SENDING_TRANSACTION)
@@ -70,58 +78,57 @@ public class BankTransactionServiceImpl {
 
         Map<String, Object> variables = Map.of(
                 "amount", requestDto.getAmount(),
-                "senderAccount", sender.getNumber()
+                "sender", senderOpt.getUser().getName(),
+                "receiver", receiver.getUser().getName(),
+                "message", "Has recibido una trasferencia bancaria"
         );
+        emailService.sendEmail(senderOpt.getUser().getEmail(),
+                "Tu transaccion ha sido enviada",
+                "Enviaste transferencia  + "+ variables
+                );
 
         emailService.sendEmail(receiver.getUser().getEmail(),
                 "Haz recibido una transferencia",
-                "Has recibido " + requestDto.getAmount() + " de la cuenta " + sender.getNumber());
+                "Has recibido " + requestDto.getAmount() + " de la cuenta " + senderOpt.getNumber());
 
-        return ResponseEntity.ok("Transferencia exitosa.");
-        }
-
-        @Transactional
-        public ResponseEntity<String> receiveMoney(TransactionRequestDto requestDto){
-        Optional<AccountBank> receiverOpt = accountBankRepository.findByNumber(requestDto.getReceiverAccountNumber());
-
-        if (receiverOpt.isEmpty()){
-            return ResponseEntity.badRequest().body("Cuenta receptora no encontrada");
-        }
-
-        AccountBank receiver = receiverOpt.get();
-
-        if (receiver.getAccountStatus() != AccountStatus.ACTIVE){
-            return ResponseEntity.badRequest().body("La cuenta del remitente está Inactiva");
-        }
-        if (requestDto.getAmount().compareTo(BigDecimal.ZERO) <= 0){
-            return ResponseEntity.badRequest().body("El monto recibido debe ser mayor que cero.");
-        }
-
-        receiver.setBalance(receiver.getBalance().add(requestDto.getAmount()));
-        accountBankRepository.save(receiver);
-
-        BankTransaction transaction = BankTransaction.builder()
-                .accountReceiving(receiver)
+        return SendMoneyResponseDto.builder()
+                .receiverAccountNumber(receiver.getNumber())
+                .senderAccountNumber(senderOpt.getNumber())
                 .amount(requestDto.getAmount())
-                .transactionType(TransactionType.RECEIVING_TRANSACTION)
-                .date(LocalDateTime.now())
-                .status(StatusTransactions.COMPLETED)
+                .message("Transaccion Realizada con exito")
                 .build();
-
-        transactionRepository.save(transaction);
-
-
-        emailService.sendEmail(receiver.getUser().getEmail(),
-                "Has recibido un depósito",
-                "Has recibido " + requestDto.getAmount() + " en tu cuenta " + receiver.getNumber());
-//
-
-        return ResponseEntity.ok("Depósito exitoso");
         }
 
 
+    @Override
+    public List<DeactivateAccountResponseDto.TransactionsResponseDto> getTransactionsHistory(Long accountId) {
+        AccountBank accountBank = accountBankRepository.findById(accountId)
+                .orElseThrow(() -> new UserNotFoundException("La cuenta no existe"));
 
-        public ResponseEntity<?> getTransactionHistory(TransactionHistoryRequestDto requestDto) {
+        List<BankTransaction> transactions = transactionRepository
+                .findByAccountSendIdOrAccountReceivingIdOrderByDateDesc(accountId, accountId);
+
+        return transactions.stream()
+                .collect(Collectors.groupingBy(
+                        t -> YearMonth.from(t.getDate()),
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ))
+                .values().stream()
+                .flatMap(List::stream)
+                .map(t -> DeactivateAccountResponseDto.TransactionsResponseDto.builder()
+                        .date(String.valueOf(t.getDate()))
+                        .receiverAccountNumber(t.getAccountReceiving().getNumber())
+                        .senderAccountNumber(t.getAccountSend().getNumber())
+                        .amount(t.getAmount())
+                        .build()
+                )
+                .toList();
+    }
+
+
+
+    public ResponseEntity<?> getTransactionHistory(TransactionHistoryRequestDto requestDto) {
             Optional<AccountBank> accountBankOptional = accountBankRepository.findByNumber(requestDto.getAccountNumber());
 
             if (accountBankOptional.isEmpty()) {
@@ -139,6 +146,7 @@ public class BankTransactionServiceImpl {
 
             return ResponseEntity.ok(transactions);
         }
+
 
 
     }

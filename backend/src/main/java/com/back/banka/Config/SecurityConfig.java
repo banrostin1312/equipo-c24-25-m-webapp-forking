@@ -75,6 +75,7 @@ public class SecurityConfig {
                                         "/v3/api-docs",
                                         "/v3/api-docs/swagger-config").permitAll()
                                 .requestMatchers("/api/banca/cuenta-bancaria/**").hasRole("CLIENT")
+                                .requestMatchers("/transactions/**").permitAll()
                         .anyRequest().authenticated())
 
                 .exceptionHandling(exception ->
