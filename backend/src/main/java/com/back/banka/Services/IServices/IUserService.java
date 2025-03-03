@@ -12,3 +12,5 @@ public interface IUserService {
     GeneralResponseDto resetPassword(ResetPasswordRequestDto requestDto);
     List<GetAllUsersResponseDto> getAllUsers();
 }
+
+

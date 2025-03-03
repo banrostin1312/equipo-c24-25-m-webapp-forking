@@ -101,7 +101,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
                     user,
                     "¡Confirmación de proceso de activacion de cuenta!",
                     "email-template",
-                    "Tu cuenta ha sido activada . Gracias por acceder a nuestros servicios bancarios");
+                    "Tu cuenta ha sido activada . recibiste un bono de 50000000. Gracias por acceder a nuestros servicios bancarios");
         } catch (Exception e) {
             logger.error("Error inesperado al enviar correo: {}", e.getMessage(), e);
         }
@@ -142,7 +142,7 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
         return AccountBank.builder()
                 .accountStatus(AccountStatus.ACTIVE)
-                .balance(BigDecimal.ZERO)
+                .balance(new BigDecimal("50000000"))
                 .type(AccountType.SAVINGS_ACCOUNT)
                 .permissionPhrase(requestDto.getSecurityPhrase())
                 .number(generateAccountNumber())
