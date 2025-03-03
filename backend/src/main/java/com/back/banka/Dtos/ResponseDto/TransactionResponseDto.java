@@ -2,6 +2,7 @@ package com.back.banka.Dtos.ResponseDto;
 
 
 import com.back.banka.Enums.StatusTransactions;
+import com.back.banka.Enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,5 +17,7 @@ public class TransactionResponseDto {
     private BigDecimal amount;
     private LocalDateTime date;
     private StatusTransactions status;
+    private TransactionType transactionType;
+
 }
 
