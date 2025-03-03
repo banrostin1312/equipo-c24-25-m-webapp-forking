@@ -13,6 +13,7 @@ import com.back.banka.Model.BankTransaction;
 import com.back.banka.Repository.BankTransactionRepository;
 import com.back.banka.Repository.IAccountBankRepository;
 import com.back.banka.Utils.IUtilsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import com.back.banka.Services.IServices.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BankTransactionServiceImpl {
@@ -35,7 +36,7 @@ public class BankTransactionServiceImpl {
 
     @Transactional
     public TransactionResponseDto transfer(Long senderAccountId, TransactionRequestDto requestDto) {
-        try {
+
             AccountBank senderAccount = accountBankRepository.findByIdAndAccountStatus(senderAccountId, AccountStatus.ACTIVE)
                     .orElseThrow(() -> new UserNotFoundException("Cuenta bancaria remitente no encontrada o inactiva"));
 
@@ -70,7 +71,7 @@ public class BankTransactionServiceImpl {
 
             transactionRepository.save(transaction);
 
-            emailService.sendEmail(senderAccount.getUser().getEmail(),
+          try{  emailService.sendEmail(senderAccount.getUser().getEmail(),
                     "Transferencia realizada con éxito",
                     "Tu transferencia de $ " + requestDto.getAmount() +
                             " a la cuenta " + receiverAccount.getNumber() + " ha sido procesada con éxito.");
@@ -80,17 +81,20 @@ public class BankTransactionServiceImpl {
                     "Has recibido una transferencia de $" + requestDto.getAmount() +
                             " desde la cuenta " + senderAccount.getNumber() + ".");
 
-            return new TransactionResponseDto(
-                    transaction.getAccountSend().getId(),
-                    transaction.getAccountReceiving().getId(),
-                    transaction.getAmount(),
-                    transaction.getDate(),
-                    transaction.getStatus()
-            );
 
         } catch (Exception e) {
-            throw new RuntimeException("Error inesperado al realizar la transferencia: " + e.getMessage());
+              log.error("Error inesperado {}", e.getMessage()
+
+
+              );
         }
+        return new TransactionResponseDto(
+                transaction.getAccountSend().getId(),
+                transaction.getAccountReceiving().getId(),
+                transaction.getAmount(),
+                transaction.getDate(),
+                transaction.getStatus()
+        );
     }
 
 
