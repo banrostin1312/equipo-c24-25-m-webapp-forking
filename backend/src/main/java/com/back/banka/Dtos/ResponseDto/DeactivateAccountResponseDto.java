@@ -2,7 +2,7 @@ package com.back.banka.Dtos.ResponseDto;
 
 import lombok.*;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -14,4 +14,14 @@ public class DeactivateAccountResponseDto {
     private Long UserId;
     private String statusAccount;
     private String dateDeactivated;
+
+    @Getter
+    @Setter
+    @Builder
+    public static class TransactionsResponseDto {
+        private String senderAccountNumber;
+        private BigDecimal amount;
+        private String receiverAccountNumber;
+        private String date;
+    }
 }

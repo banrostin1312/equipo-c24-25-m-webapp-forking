@@ -29,7 +29,7 @@ public class AccountBank {
         @Enumerated(EnumType.STRING)
         private AccountType type;
 
-        @Column(precision = 10, scale = 2,nullable = false)
+        @Column(precision = 15, scale = 2,nullable = false)
         private BigDecimal balance;
 
         @ManyToOne(fetch = FetchType.LAZY)
@@ -48,6 +48,5 @@ public class AccountBank {
         private LocalDate dateOfActivation;
         private LocalDate dateOfDeactivation;
         private LocalDate dateOfReactivation;
-
 
 }

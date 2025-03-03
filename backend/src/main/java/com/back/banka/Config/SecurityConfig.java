@@ -73,14 +73,20 @@ public class SecurityConfig {
                 .authorizeHttpRequests( auth ->
 
                         auth.requestMatchers("/api/banca/auth/**",
-                                        "/api/banca/users/**",
+                                        "/api/banca/users/recuperar-contrasenia",
+                                        "/api/banca/users/enviar-correo-reestablecer/",
+                                        "/api/banca/users/usuarios",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
                                         "/v2/api-docs",
                                         "/v3/api-docs",
                                         "/v3/api-docs/swagger-config"
                                         ).permitAll()
-                                .requestMatchers("/api/banca/cuenta-bancaria/**").hasRole("CLIENT")
+                                .requestMatchers(
+                                        "/api/banca/cuenta-bancaria/**",
+                                "/api/banca/transacciones/**",
+                                        "/api/banca/users/editar/{id}"
+                                ).hasRole("CLIENT")
                         .anyRequest().authenticated())
 
                 .exceptionHandling(exception ->
@@ -111,7 +117,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -32,7 +32,7 @@ public class UtilsServiceImpl implements IUtilsService {
     public void validateOwnership(AccountBank accountBank,
                                   String username) {
         if (!accountBank.getUser().getEmail().equals(username)) {
-            throw new CustomAuthenticationException("Error: no esta autorizado para desactivar esta cuenta");
+            throw new CustomAuthenticationException("Error: no esta autorizado para hacer movimientos en esta cuenta");
 
         }
     }

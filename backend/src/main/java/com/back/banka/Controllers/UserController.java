@@ -1,9 +1,13 @@
 package com.back.banka.Controllers;
 
 import com.back.banka.Dtos.RequestDto.ResetPasswordRequestDto;
+import com.back.banka.Dtos.RequestDto.UpdateUserRequestDto;
 import com.back.banka.Dtos.ResponseDto.GeneralResponseDto;
 import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
+import com.back.banka.Dtos.ResponseDto.UpdateUserResponseDto;
+import com.back.banka.Model.User;
 import com.back.banka.Services.IServices.IUserService;
+import com.back.banka.Services.Impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +28,7 @@ public class UserController {
 
      @Autowired
     public UserController(
-            IUserService userService) {
+            IUserService userService, UserServiceImpl userServiceImpl) {
         this.userService = userService;
     }
 
@@ -72,6 +77,12 @@ public class UserController {
         log.info("Datos recuperadoso: ");
         return ResponseEntity.status(HttpStatus.OK).body(getAllUser);
 
+    }
+    @PreAuthorize("hasRole('CLIENT')")
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<UpdateUserResponseDto> updateUser (@PathVariable Long id, @Valid @RequestBody UpdateUserRequestDto request){
+         UpdateUserResponseDto updatedUser = userService.updateUser(id, request);
+         return ResponseEntity.ok(updatedUser);
     }
 
 }

@@ -1,12 +1,13 @@
 package com.back.banka.Services.IServices;
 
-import com.back.banka.Model.AccountBank;
-import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.back.banka.Dtos.ResponseDto.SendMoneyResponseDto;
+import com.back.banka.Dtos.RequestDto.TransactionRequestDto;
+import com.back.banka.Dtos.ResponseDto.DeactivateAccountResponseDto;
 
-@Repository
+import java.util.List;
+
 public interface BankTransactionService {
-
-    Optional<AccountBank> findByUserId(Long userId);
+    SendMoneyResponseDto sendMoney(Long accountId, TransactionRequestDto requestDto);
+    List<DeactivateAccountResponseDto.TransactionsResponseDto> getTransactionsHistory(Long accountId);
 }

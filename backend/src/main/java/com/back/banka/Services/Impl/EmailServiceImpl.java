@@ -71,4 +71,5 @@ public class EmailServiceImpl implements IEmailService {
         context.setVariables(variables);
         return templateEngine.process(templateName, context);
     }
+
 }
