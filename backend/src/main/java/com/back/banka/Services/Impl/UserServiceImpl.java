@@ -178,30 +178,33 @@ Método que permite a un usuario modificar su información personal.
     @Override
     public UpdateUserResponseDto updateUser(Long id, UpdateUserRequestDto request){
         try{
-            if (userRepository.existsByEmail(request.getEmail())) {
+            User user = this.userRepository.findById(id).orElseThrow(()
+                    ->  new UserNotFoundException("usuario no encontrado"));
+
+            if ( request.getEmail() != null && !request.getEmail().equals(user.getEmail()) &&
+                    userRepository.existsByEmailAndIdNot(request.getEmail(), id)) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "El correo electrónico ya está registrado."
                 );
             }
 
-            if (userRepository.existsByDNI(request.getDNI())) {
+            if (request.getDNI() !=null && !request.getDNI().equals(user.getDNI()) &&
+                    userRepository.existsByDNIAndIdNot(request.getDNI(),id)) {
                 throw new DniAlreadyExistsException("El DNI ya está registrado.");
             }
 
-            Optional<User> userOptional = userRepository.findById(id);
 
 
-        User user = userOptional.orElseThrow(() ->
-                new UserNotFoundException("Usuario no encontrado"));
 
-
-        user.setName(request.getName());
-        user.setDNI(request.getDNI());
-        user.setEmail(request.getEmail());
-            if (request.getDateBirthDay() == null) {
-                throw new IllegalArgumentException("Fecha no disponible");
+        if(request.getName() != null)
+        {user.setName(request.getName());
+        }
+        if(request.getDNI() != null){user.setDNI(request.getDNI());}
+        if(request.getEmail() != null){user.setEmail(request.getEmail());}
+            if (request.getDateBirthDay() != null) {
+                user.setDateBirthDay(request.getDateBirthDay());
             }
-            user.setDateBirthDay(request.getDateBirthDay());
+
 
             userRepository.save(user);
 
@@ -210,6 +213,8 @@ Método que permite a un usuario modificar su información personal.
                     user.getDNI(),
                     user.getEmail(),
                     user.getDateBirthDay());
+        }catch (UserNotFoundException | DniAlreadyExistsException | ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Error interno del servidor", e);
         }
