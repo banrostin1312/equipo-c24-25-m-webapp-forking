@@ -131,8 +131,8 @@ public class AccountBankServiceImpl implements IAccountBankService {
 
         int accountCount = this.accountBankRepository.countByUser(user);
 
-        if (accountCount >=2) {
-            throw new BadRequestExceptions("no puede crear mas de 2 cuentas Bancarias");
+        if (accountCount >=1) {
+            throw new BadRequestExceptions("por ahora solo se puede activar une cuenta");
         }
 
         return accountCount;

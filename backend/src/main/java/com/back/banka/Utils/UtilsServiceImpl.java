@@ -4,6 +4,7 @@ import com.back.banka.Enums.TokenType;
 import com.back.banka.Exceptions.Custom.BadRequestExceptions;
 import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Model.AccountBank;
+import com.back.banka.Model.SecurityUser;
 import com.back.banka.Model.Tokens;
 import com.back.banka.Model.User;
 import com.back.banka.Repository.ITokenRepository;
@@ -74,6 +75,31 @@ public class UtilsServiceImpl implements IUtilsService {
             return null;
         }
     }
+
+    public Long getAuthenticatedUserId() {
+        Logger logger = LoggerFactory.getLogger(getClass());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            logger.error("No hay autenticación en el contexto de seguridad.");
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof SecurityUser) {
+            // Acceder al User dentro de SecurityUser y obtener el ID
+            User user = ((SecurityUser) principal).getUser(); // Necesitarás añadir este método getter
+            if (user != null) {
+                Long userId = user.getId(); // O el método apropiado según tu entidad User
+                logger.info("Usuario autenticado ID: " + userId);
+                return userId;
+            }
+        }
+
+        logger.error("No se pudo obtener el ID del usuario autenticado.");
+        return null;
+    }
+
 
     @Override
     public void sendAccountNotification(User user,
