@@ -13,7 +13,7 @@ public interface IUserService {
     void sendPasswordResetEmail(String email);
     GeneralResponseDto resetPassword(ResetPasswordRequestDto requestDto);
     List<GetAllUsersResponseDto> getAllUsers();
-    UpdateUserResponseDto updateUser(Long id, UpdateUserRequestDto request);
+    UpdateUserResponseDto updateUser( UpdateUserRequestDto request);
 }
 
 

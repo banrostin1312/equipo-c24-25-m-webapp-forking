@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -122,6 +121,8 @@ public class BankTransactionServiceImpl {
                 transaction.getAccountReceiving().getId(),
                 transaction.getAmount(),
                 transaction.getDate(),
+                transaction.getAccountSend().getNumber(),
+                transaction.getAccountReceiving().getNumber(),
                 transaction.getStatus(),
                 transaction.getTransactionType()
         );
@@ -157,8 +158,12 @@ public class BankTransactionServiceImpl {
                                 transaction.getAccountReceiving().getId(),
                                 transaction.getAmount(),
                                 transaction.getDate(),
+                                transaction.getAccountSend().getNumber(),
+                                transaction.getAccountReceiving().getNumber(),
                                 transaction.getStatus(),
                                 isIncoming ? TransactionType.RECEIVING_TRANSACTION : TransactionType.SENDING_TRANSACTION
+
+
                         );
                     })
                     .collect(Collectors.toList());

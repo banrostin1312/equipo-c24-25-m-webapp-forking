@@ -129,4 +129,10 @@ public class UtilsServiceImpl implements IUtilsService {
                 .build();
         this.tokenRepository.save(tokenSaved);
     }
+
+    public void validateUserAuthorization(AccountBank accountBank, Long authenticatedUserId) {
+        if (!accountBank.getUser().getId().equals(authenticatedUserId)) {
+            throw new CustomAuthenticationException("No autorizado para reactivar esta cuenta");
+        }
+    }
 }

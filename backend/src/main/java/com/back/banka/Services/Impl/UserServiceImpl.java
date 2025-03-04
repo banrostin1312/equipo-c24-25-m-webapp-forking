@@ -4,6 +4,7 @@ import com.back.banka.Dtos.RequestDto.UpdateUserRequestDto;
 import com.back.banka.Dtos.ResponseDto.GeneralResponseDto;
 import com.back.banka.Dtos.ResponseDto.GetAllUsersResponseDto;
 import com.back.banka.Dtos.ResponseDto.UpdateUserResponseDto;
+import com.back.banka.Exceptions.Custom.CustomAuthenticationException;
 import com.back.banka.Exceptions.Custom.DniAlreadyExistsException;
 import com.back.banka.Exceptions.Custom.UserNotFoundException;
 import com.back.banka.Model.User;
@@ -177,20 +178,28 @@ Método que permite a un usuario modificar su información personal.
  **/
     @Transactional
     @Override
-    public UpdateUserResponseDto updateUser(Long id, UpdateUserRequestDto request){
+    public UpdateUserResponseDto updateUser( UpdateUserRequestDto request){
         try{
-            User user = this.userRepository.findById(id).orElseThrow(()
+            Long userID = this.utilsService.getAuthenticatedUserId();
+            if(userID == null){
+                throw new CustomAuthenticationException("Error: usuario no autenticaso");
+            }
+
+
+            User user = this.userRepository.findById(userID).orElseThrow(()
                     ->  new UserNotFoundException("usuario no encontrado"));
 
             if ( request.getEmail() != null && !request.getEmail().equals(user.getEmail()) &&
-                    userRepository.existsByEmailAndIdNot(request.getEmail(), id)) {
+                    userRepository.existsByEmailAndIdNot(request.getEmail(), userID)) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "El correo electrónico ya está registrado."
                 );
             }
-
+             if(!userID.equals(this.utilsService.getAuthenticatedUserId())){
+                 throw new CustomAuthenticationException("Error: no esta autorizado para editar datos de este usuarop");
+             }
             if (request.getDNI() !=null && !request.getDNI().equals(user.getDNI()) &&
-                    userRepository.existsByDNIAndIdNot(request.getDNI(),id)) {
+                    userRepository.existsByDNIAndIdNot(request.getDNI(),userID)) {
                 throw new DniAlreadyExistsException("El DNI ya está registrado.");
             }
 

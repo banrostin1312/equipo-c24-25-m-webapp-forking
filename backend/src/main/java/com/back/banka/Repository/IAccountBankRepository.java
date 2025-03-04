@@ -13,6 +13,7 @@ public interface IAccountBankRepository extends JpaRepository<AccountBank, Long>
     boolean existsByNumber(String number);
     boolean existsByUser(User user);
     int countByUser(User user);
+    Optional<AccountBank> findByUserId(Long userId);
     Optional<AccountBank> findByNumber(String number);
     Optional<AccountBank> findById(Long id);
     Optional<AccountBank> findByIdAndAccountStatus(Long id, AccountStatus accountStatus);

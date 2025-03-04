@@ -80,8 +80,8 @@ public class UserController {
     }
     @PreAuthorize("hasRole('CLIENT')")
     @PutMapping("/editar/{id}")
-    public ResponseEntity<UpdateUserResponseDto> updateUser (@PathVariable Long id, @Valid @RequestBody UpdateUserRequestDto request){
-         UpdateUserResponseDto updatedUser = userService.updateUser(id, request);
+    public ResponseEntity<UpdateUserResponseDto> updateUser ( @Valid @RequestBody UpdateUserRequestDto request){
+         UpdateUserResponseDto updatedUser = userService.updateUser( request);
          return ResponseEntity.ok(updatedUser);
     }
 
