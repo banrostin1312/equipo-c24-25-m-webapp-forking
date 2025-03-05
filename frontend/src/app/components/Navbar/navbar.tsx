@@ -4,11 +4,19 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useWebApp } from '@/src/context/WebappContext'
 //Libraries
 import { Menu, X } from 'lucide-react'
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsopen] = useState(false)
+   
+  const { accessToken, setAccessToken } = useWebApp() || { accessToken: null, setAccessToken: () => {} };
+
+  const handleLogOut = () => {
+    localStorage.removeItem("access_token");
+    setAccessToken(null);
+  }
 
   return (
     <div>
@@ -83,9 +91,11 @@ const Navbar: React.FC = () => {
                         <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/">Ayuda</Link></li>
                     </div>
 
-                    <div className="flex mr-4">
-                        <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300"><Link href="/">Homebanking</Link></button></li>
+                    <div className="flex mr-4 justify-center items-center">
+                        <li><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300"><Link href="/iniciarSesion">Homebanking</Link></button></li>
                         <Link href="/registro" className=""><button className="bg-nav-buttons hover:bg-buttons-hover p-3 m-3 rounded-full w-[125px] h-[45px] flex justify-center items-center hover:text-white active:shadow-[0px_30px_10px_-20px_#119E1F] transition-colors duration-300">Registrate</button></Link>
+                        {accessToken ? <Link href={"/"}><button className='flex justify-center items-center' onClick={handleLogOut}><img src="/logout-button.svg" alt="logout" className='w-[40x] h-[40px]'/></button></Link> :null
+}
                     </div>
 
                 </ul>

@@ -7,7 +7,7 @@ import Transaction from "../transaction/Transaction"
 
 const TransactionsView: React.FC = () => {
 
-    
+
 
     return (
         <div className="flex flex-col md:justify-between md:flex-row px-20 space-y-4 md:space-y-14 mb-20">
@@ -59,9 +59,9 @@ const TransactionsView: React.FC = () => {
                     <p className="text-[22px] text-nowrap">Historial de transacciones</p>
                     <button className="flex justify-center items-center bg-nav-buttons w-[86px] h-[45px] rounded-[30px] hover:text-white hover:bg-buttons-hover"><p className="text-[11px]">Ver Todo</p></button>
                 </div>
+                <Transaction />
             </div>
 
-             <Transaction/>
         </div>
     )
 }

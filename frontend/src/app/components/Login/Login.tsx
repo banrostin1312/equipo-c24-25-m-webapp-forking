@@ -6,8 +6,12 @@ import { ILogin } from '@/src/types/ILogin'
 //Assets
 import { useState } from 'react'
 import axios from 'axios'
-
+import { useRouter } from 'next/navigation'
+import { useWebApp } from '@/src/context/WebappContext'
 const Login: React.FC = () => {
+  const router = useRouter();
+  const { setAccessToken } = useWebApp();
+
   const [dataForm, setDataForm] = useState<ILogin>({
     email: '',
     password: '',
@@ -28,8 +32,9 @@ const Login: React.FC = () => {
         'https://equipo-c24-25-m-webapp-1.onrender.com/api/banca/auth/login',
         dataForm
       )
-      const accessToken= response.data.access_token;
-      localStorage.setItem("access_token",accessToken)
+      const accessToken = response.data.access_token;
+      localStorage.setItem("access_token", accessToken)
+      setAccessToken(accessToken);
       console.log('Inicio de sesión existoso', response.data)
 
       Swal.fire({
@@ -37,7 +42,7 @@ const Login: React.FC = () => {
         icon: 'success',
         draggable: true,
       })
-
+      router.push("/transactions");
       setDataForm({
         email: '',
         password: '',
