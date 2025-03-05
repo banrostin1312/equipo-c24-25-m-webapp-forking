@@ -4,9 +4,19 @@ import axios from "axios"
 
 
 const Transaction:React.FC=() => {
-    const [transactions, setTransactions] = useState<ITransaction[]>([])
-    const accessToken = localStorage.getItem("access_token")
+    const [transactions, setTransactions] = useState<ITransaction[]>([]);
+    const [accessToken,setAccessToken] = useState<string | null >(null);
+
+
+    useEffect(() =>{
+    setAccessToken(localStorage.getItem("access_token"));
+    },[]);
+
     useEffect(() => {
+        if(!accessToken){
+            return;
+        }
+
         const fetchTransactions = async () => {
             try {
                 const response = await axios.get("https://equipo-c24-25-m-webapp-1.onrender.com/api/banca/transacciones/obtener-transacciones",{
