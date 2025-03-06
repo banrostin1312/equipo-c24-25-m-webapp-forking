@@ -8,7 +8,6 @@ import { useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 //Context
-import { useWebApp } from "@/src/context/WebappContext"
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const Registrarse: React.FC = () => {
