@@ -43,6 +43,9 @@ const ActivationView: React.FC = () => {
                     "Content-Type": "application/json",
                 }
             })
+
+            const balance = response.data.balance;
+            localStorage.setItem("balance",balance);
             console.log("SU CUENTA SE ACTIVO CORRECTAMENTE", response.data);
           
             Swal.fire({

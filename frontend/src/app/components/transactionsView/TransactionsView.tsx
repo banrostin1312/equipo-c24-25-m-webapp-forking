@@ -1,13 +1,17 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Transaction from "../transaction/Transaction"
 
 
 
-
 const TransactionsView: React.FC = () => {
+    const [balance,setBalance] = useState<string|null>("")
 
-
+   useEffect(() => {
+     const balance = localStorage.getItem("balance");
+     setBalance(balance);
+   },[])
 
     return (
         <div className="flex flex-col md:justify-between md:flex-row px-20 space-y-4 md:space-y-14 mb-20">
@@ -20,7 +24,7 @@ const TransactionsView: React.FC = () => {
                 w-[331px] h-[105px]
                 ">
                     <h3 className="text-[16px] text-letraestadodecuenta">Estado de cuenta </h3>
-                    <p className="text-[20px]">$1.280.000,32</p>
+                    <p className="text-[20px]">${balance}</p>
                 </div>
 
                 <div className="flex flex-col justify-center items-center space-y-2">

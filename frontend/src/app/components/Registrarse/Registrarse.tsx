@@ -7,11 +7,13 @@ import { IRegister } from "@/src/types/IRegister"
 import { useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
+import { useWebApp } from "@/src/context/WebappContext"
 //Context
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const Registrarse: React.FC = () => {
-const router = useRouter();
+    const router = useRouter();
+    const { setAccessToken } = useWebApp();
 
     const [dataForm, setDataForm] = useState<IRegister>({
         "name": "",
@@ -21,8 +23,8 @@ const router = useRouter();
         "country": "",
         "dni": ""
     })
-    const [emaileErrorMessage,setEmailErrorMessage] = useState<string>("");
-    const [passwordErrorMessage,setPasswordErrorMessage] = useState<string>("");
+    const [emaileErrorMessage, setEmailErrorMessage] = useState<string>("");
+    const [passwordErrorMessage, setPasswordErrorMessage] = useState<string>("");
 
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,14 +34,14 @@ const router = useRouter();
             [name]: value,
         }))
 
-        if(name === "email"){
+        if (name === "email") {
             if (/^\S+@\S+\.\S+$/.test(value)) {
                 setEmailErrorMessage("");  // Si el correo es válido, borra el mensaje de error
             }
         }
 
-        if(name === "password"){
-            if(!/^(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(value))
+        if (name === "password") {
+            if (!/^(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(value))
                 setPasswordErrorMessage("");
         }
     };
@@ -58,17 +60,20 @@ const router = useRouter();
         }
 
         try {
-            
-            const response = await axios.post(`${BACKEND_URL}/api/banca/auth/registrarse`, dataForm)
-         console.log("registro existoso",response.data)
 
-          
+            const response = await axios.post(`${BACKEND_URL}/api/banca/auth/registrarse`, dataForm)
+            const accessToken = response.data.access_token;
+            localStorage.setItem("access_token", accessToken);
+            setAccessToken(accessToken);
+            console.log("registro existoso", response.data)
+
+
             Swal.fire({
                 title: "Registro Exitoso",
                 icon: "success",
                 draggable: true
-              });
-           
+            });
+
 
             setDataForm({
                 "name": "",
@@ -78,7 +83,7 @@ const router = useRouter();
                 "country": "",
                 "dni": ""
             })
-              router.push("/iniciarSesion");
+            router.push("/activarCuenta");
         } catch (error) {
             console.error("ERROR AL REGISTRARSE", error);
             alert("HUBO UN ERROR AL REGISTRARSE")
@@ -93,14 +98,14 @@ const router = useRouter();
                 <div className="flex justify-center items-center bg-middle-title md:w-[457px] w-[375px] md:max-w-[457px] h-[60px] "><img src="/LOGOsinbanca.png" alt="Logo" className="w-[166px] h-[60px]" /></div>
                 <form action="" className="flex flex-col justify-center items-center md:w-[343px] md:h-[500px] border-[1px] border-border-forms rounded-[20px] mt-2 mb-2" onSubmit={handleSubmit}>
                     <label htmlFor="">Nombre:</label>
-                    <input  value={dataForm.name} onChange={handleChange} type="text" name="name" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
+                    <input value={dataForm.name} onChange={handleChange} type="text" name="name" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
 
                     <label htmlFor="">Edad:</label>
                     <input value={dataForm.age} onChange={handleChange} type="number" name="age" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md  text-center" />
 
                     <label htmlFor="">Email:</label>
                     <input value={dataForm.email} onChange={handleChange} type="text" name="email" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
-                      {emaileErrorMessage && <p className="text-red-500 text-sm mt-1 text-center">{emaileErrorMessage}</p>}
+                    {emaileErrorMessage && <p className="text-red-500 text-sm mt-1 text-center">{emaileErrorMessage}</p>}
                     <label htmlFor="">Contraseña:</label>
                     <input value={dataForm.password} onChange={handleChange} type="password" name="password" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
                     {passwordErrorMessage && <p className="text-red-500 text-sm mt-1 text-center">{passwordErrorMessage}</p>}
