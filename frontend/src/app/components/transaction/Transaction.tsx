@@ -7,6 +7,7 @@ const Transaction:React.FC=() => {
     const [transactions, setTransactions] = useState<ITransaction[]>([]);
     const [accessToken,setAccessToken] = useState<string | null >(null);
 
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
    useEffect(() =>{
       const token = localStorage.getItem("access_token");
@@ -20,7 +21,7 @@ const Transaction:React.FC=() => {
       
         const fetchTransactions = async () => {
             try {
-                const response = await axios.get("https://equipo-c24-25-m-webapp-1.onrender.com/api/banca/transacciones/obtener-transacciones",{
+                const response = await axios.get(`${BACKEND_URL}/api/banca/transacciones/obtener-transacciones`,{
                     headers:{
                           Authorization: `Bearer ${accessToken}`
                     }

@@ -9,6 +9,7 @@ import axios from "axios"
 import { useRouter } from "next/navigation"
 //Context
 import { useWebApp } from "@/src/context/WebappContext"
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const Registrarse: React.FC = () => {
 const router = useRouter();
@@ -60,7 +61,7 @@ const {setAccessToken} = useWebApp();
 
         try {
             
-            const response = await axios.post("https://equipo-c24-25-m-webapp-1.onrender.com/api/banca/auth/registrarse", dataForm)
+            const response = await axios.post(`${BACKEND_URL}/api/banca/auth/registrarse`, dataForm)
          console.log("registro existoso",response.data)
 
           

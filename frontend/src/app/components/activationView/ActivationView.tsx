@@ -7,6 +7,7 @@ import { useWebApp } from "@/src/context/WebappContext";
 import { useRouter } from "next/navigation";
 //Types
 import { IVerification } from "@/src/types/IVerification";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 
 const ActivationView: React.FC = () => {
@@ -36,7 +37,7 @@ const ActivationView: React.FC = () => {
 
         try {
 
-            const response = await axios.post("https://equipo-c24-25-m-webapp-1.onrender.com/api/banca/cuenta-bancaria/activar", dataForm,{
+            const response = await axios.post(`${BACKEND_URL}/api/banca/cuenta-bancaria/activar`, dataForm,{
                 headers:{
                     Authorization:`Bearer ${accessToken}`,
                     "Content-Type": "application/json",
