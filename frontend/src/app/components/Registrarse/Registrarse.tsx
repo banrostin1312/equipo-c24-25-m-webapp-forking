@@ -13,7 +13,6 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const Registrarse: React.FC = () => {
 const router = useRouter();
-const {setAccessToken} = useWebApp();
 
     const [dataForm, setDataForm] = useState<IRegister>({
         "name": "",
