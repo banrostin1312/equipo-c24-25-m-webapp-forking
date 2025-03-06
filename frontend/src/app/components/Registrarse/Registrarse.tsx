@@ -6,9 +6,13 @@ import { IRegister } from "@/src/types/IRegister"
 //Assets
 import { useState } from "react"
 import axios from "axios"
+import { useRouter } from "next/navigation"
+//Context
+import { useWebApp } from "@/src/context/WebappContext"
 
 const Registrarse: React.FC = () => {
-
+const router = useRouter();
+const {setAccessToken} = useWebApp();
 
     const [dataForm, setDataForm] = useState<IRegister>({
         "name": "",
@@ -18,6 +22,9 @@ const Registrarse: React.FC = () => {
         "country": "",
         "dni": ""
     })
+    const [emaileErrorMessage,setEmailErrorMessage] = useState<string>("");
+    const [passwordErrorMessage,setPasswordErrorMessage] = useState<string>("");
+
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -25,12 +32,34 @@ const Registrarse: React.FC = () => {
             ...prevState,
             [name]: value,
         }))
+
+        if(name === "email"){
+            if (/^\S+@\S+\.\S+$/.test(value)) {
+                setEmailErrorMessage("");  // Si el correo es válido, borra el mensaje de error
+            }
+        }
+
+        if(name === "password"){
+            if(!/^(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(value))
+                setPasswordErrorMessage("");
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
+        if (!/^\S+@\S+\.\S+$/.test(dataForm.email)) {
+            setEmailErrorMessage("❌ Ingresa un correo válido");
+            return;
+        }
+
+        if (!/^(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(dataForm.password)) {
+            setPasswordErrorMessage("❌ La contraseña debe tener al menos 8 caracteres, una mayúscula y un carácter especial");
+            return;
+        }
+
         try {
-            console.log(dataForm)
+            
             const response = await axios.post("https://equipo-c24-25-m-webapp-1.onrender.com/api/banca/auth/registrarse", dataForm)
          console.log("registro existoso",response.data)
 
@@ -50,6 +79,7 @@ const Registrarse: React.FC = () => {
                 "country": "",
                 "dni": ""
             })
+              router.push("/iniciarSesion");
         } catch (error) {
             console.error("ERROR AL REGISTRARSE", error);
             alert("HUBO UN ERROR AL REGISTRARSE")
@@ -71,9 +101,10 @@ const Registrarse: React.FC = () => {
 
                     <label htmlFor="">Email:</label>
                     <input value={dataForm.email} onChange={handleChange} type="text" name="email" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
-
+                      {emaileErrorMessage && <p className="text-red-500 text-sm mt-1 text-center">{emaileErrorMessage}</p>}
                     <label htmlFor="">Contraseña:</label>
                     <input value={dataForm.password} onChange={handleChange} type="password" name="password" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
+                    {passwordErrorMessage && <p className="text-red-500 text-sm mt-1 text-center">{passwordErrorMessage}</p>}
 
                     <label htmlFor="">Pais:</label>
                     <input value={dataForm.country} onChange={handleChange} type="text" name="country" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />

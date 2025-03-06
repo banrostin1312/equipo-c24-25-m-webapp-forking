@@ -17,6 +17,12 @@ export const WebAppProvider:React.FC<{children:ReactNode}> = ({children}) =>{
 const [accessToken,setAccessToken] = useState<string | null>(null);
 
 
+useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      setAccessToken(token);
+    }
+  }, []);
 
 
 return (

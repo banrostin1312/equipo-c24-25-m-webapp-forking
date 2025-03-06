@@ -42,7 +42,7 @@ const Login: React.FC = () => {
         icon: 'success',
         draggable: true,
       })
-      router.push("/transactions");
+      router.push("/activarCuenta");
       setDataForm({
         email: '',
         password: '',
