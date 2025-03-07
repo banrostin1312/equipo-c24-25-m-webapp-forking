@@ -1,6 +1,6 @@
 import { ITransfer } from "@/src/types/ITransfer";
 import axios from "axios";
-import { useState,useEffect } from "react";
+import { useState, } from "react";
 //Libraries
 import Swal from "sweetalert2";
 //Context
