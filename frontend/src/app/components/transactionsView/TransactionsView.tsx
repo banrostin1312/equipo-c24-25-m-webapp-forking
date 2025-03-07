@@ -1,17 +1,38 @@
 "use client"
-
+//Assets
 import { useEffect, useState } from "react"
 import Transaction from "../transaction/Transaction"
-
-
+import NewTransfer from "../newTransfer/NewTransfer"
+import axios from "axios"
+//Context
+import { useWebApp } from "@/src/context/WebappContext"
 
 const TransactionsView: React.FC = () => {
-    const [balance,setBalance] = useState<string|null>("")
+    const [balance, setBalance] = useState<string | null>("")
+    const [view, setView] = useState<"transactions" | "newTransfer">("transactions")
+    const {accessToken} = useWebApp();
 
-   useEffect(() => {
-     const balance = localStorage.getItem("balance");
-     setBalance(balance);
-   },[])
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+   
+        const getActualBalance = async () => {
+            try {
+                const response = await axios.get(`${BACKEND_URL}/api/banca/cuenta-bancaria/saldo`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+                setBalance(response.data.balance);
+                console.log("GET SALDO CON EXITO",response.data);
+            } catch (error) {
+              console.log("ERROR AL TRAER EL SALDO",error);
+            }
+        }
+        
+        useEffect(()=> {
+           getActualBalance()
+        },[accessToken])
 
     return (
         <div className="flex flex-col md:justify-between md:flex-row px-20 space-y-4 md:space-y-14 mb-20">
@@ -36,7 +57,7 @@ const TransactionsView: React.FC = () => {
                         </div>
                     </button>
 
-                    <button>
+                    <button onClick={() => setView("newTransfer")}>
                         <div className="flex flex-row justify-between items-center w-[328px] h-[45px] bg-nav-buttons rounded-[30px] px-6 hover:bg-buttons-hover hover:text-white">
                             <p className="text-[16px]">Nueva Transferencia</p>
                             <img src="mas-icon.png" alt="+ icon" className="w-[20px] h-[20px]" />
@@ -50,21 +71,22 @@ const TransactionsView: React.FC = () => {
                         </div>
                     </button>
 
-                    <p className="text-transfer-color text-[28px]">Transferencia</p>
-                    <input type="text" placeholder="CBU" className="border-[1px] border-transfer-inputs rounded-[8px] w-[312px] h-[44px] placeholder:text-black" />
-                    <input type="number" placeholder="MONTO" className="border-[1px] border-transfer-inputs rounded-[8px] w-[312px] h-[44px] placeholder:text-black" />
-                    <button className="bg-nav-buttons w-[125px] h-[45px] rounded-[30px] hover:text-white hover:bg-buttons-hover"><p className="text-[11px]">Enviar Dinero</p></button>
+                    
                 </div>
 
             </div>
 
-            <div className="flex flex-col items-center md:mt-20 w-full">
-                <div className="flex flex-col md:flex-row md:justify-between w-full px-11 justify-center items-center ">
-                    <p className="text-[22px] text-nowrap">Historial de transacciones</p>
-                    <button className="flex justify-center items-center bg-nav-buttons w-[86px] h-[45px] rounded-[30px] hover:text-white hover:bg-buttons-hover"><p className="text-[11px]">Ver Todo</p></button>
-                </div>
-                <Transaction />
-            </div>
+            {view === "transactions" ?
+                <div className="flex flex-col items-center md:mt-20 w-full">
+                    <div className="flex flex-col md:flex-row md:justify-between w-full px-11 justify-center items-center ">
+                        <p className="text-[22px] text-nowrap">Historial de transacciones</p>
+                        <button className="flex justify-center items-center bg-nav-buttons w-[86px] h-[45px] rounded-[30px] hover:text-white hover:bg-buttons-hover"><p className="text-[11px]">Ver Todo</p></button>
+                    </div>
+                    <Transaction />
+                </div> : <NewTransfer goBack={() => setView("transactions")} />
+
+
+            }
 
         </div>
     )

@@ -29,7 +29,8 @@ export default {
         "estadocuenta-border":"#E6E9EE",
         "letraestadodecuenta":"#AFAFAF",
         "transfer-color":"#435D6B",
-        "transfer-inputs":"#93A300"
+        "transfer-inputs":"#93A300",
+        "transfer-bg":"#EFEFEF"
       },
     },
   },
