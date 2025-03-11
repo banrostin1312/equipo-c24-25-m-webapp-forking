@@ -81,7 +81,7 @@ const Navbar: React.FC = () => {
               <Link href="/">Ayuda</Link>
             </li>
             <li className="flex justify-center items-center bg-nav-buttons p-3 m-3 rounded-lg w-full h-[40px]">
-              <Link href="/">Homebanking</Link>
+              <Link href="/iniciarSesion">Homebanking</Link>
             </li>
             <li className="flex justify-center items-center bg-nav-buttons p-3 m-3 rounded-lg w-full h-[40px] ">
               <Link href="/registro">Registrate</Link>
