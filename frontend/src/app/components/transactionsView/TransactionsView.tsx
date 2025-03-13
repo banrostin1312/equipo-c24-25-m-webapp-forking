@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Transaction from "../transaction/Transaction"
 import NewTransfer from "../newTransfer/NewTransfer"
 import axios from "axios"
+import Link from "next/link"
 //Context
 import { useWebApp } from "@/src/context/WebappContext"
 
@@ -70,6 +71,13 @@ const TransactionsView: React.FC = () => {
                             <img src="mas-icon.png" alt="+ icon" className="w-[20px] h-[20px]" />
                         </div>
                     </button>
+
+                    <Link href={"/perfil"}>
+                        <div className="flex flex-row justify-between items-center w-[328px] h-[45px] bg-nav-buttons rounded-[30px] px-6 hover:bg-buttons-hover hover:text-white">
+                            <p className="text-[16px]">Mi Perfil</p>
+                            <img src="mas-icon.png" alt="+ icon" className="w-[20px] h-[20px]" />
+                        </div>
+                    </Link>
 
                     
                 </div>

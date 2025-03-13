@@ -11,7 +11,7 @@ const Page: React.FC = () => {
     userName: '',
     surname: '',
     city: '',
-    language: '',
+    language: 'Español',
     timeZone: '',
   })
 
@@ -20,7 +20,7 @@ const Page: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('accessToken')
+        const token = localStorage.getItem('access_token')
         console.log(token)
 
         if (!token) {
@@ -35,7 +35,15 @@ const Page: React.FC = () => {
             },
           }
         )
-        setDataForm(response.data)
+        setDataForm({
+          name: response.data.name || '',
+          userName: response.data.userName || '',
+          surname: response.data.surname || '',
+          city: response.data.country || '',
+          language: response.data.language || '',
+          timeZone: response.data.timeZone || '',
+        });
+
       } catch (error) {
         console.error('Error al obtener el perfil:', error)
       }
@@ -74,7 +82,7 @@ const Page: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center mt-10">
       <form onSubmit={handleSubmit} className="w-[90vw]">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center">
@@ -142,7 +150,7 @@ const Page: React.FC = () => {
                 name="language"
                 id="language"
                 placeholder="Lengaje"
-                value={dataForm.language}
+                value={"Español"}
                 readOnly={!isEditing}
                 onChange={handleChange}
                 className="w-[40vw] h-[39px] border-2 border-input-border rounded-md pl-4"

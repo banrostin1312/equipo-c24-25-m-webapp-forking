@@ -76,13 +76,13 @@ const Registrarse: React.FC = () => {
         }
 
         try {
-
+             
             const response = await axios.post(`${BACKEND_URL}/api/banca/auth/registrarse`, dataForm)
             const accessToken = response.data.access_token;
             localStorage.setItem("access_token", accessToken);
             setAccessToken(accessToken);
             console.log("registro existoso", response.data)
-
+           
 
             Swal.fire({
                 title: "Registro Exitoso",

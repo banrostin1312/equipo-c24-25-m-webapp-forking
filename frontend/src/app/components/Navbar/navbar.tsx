@@ -96,10 +96,10 @@ const Navbar: React.FC = () => {
                 <ul className="flex justify-between items-center w-full">
                     <li> <Link href="/"><Image height={189} width={130} src="/LOGO.png" alt="Logo" className="ml-4"></Image></Link></li>
                     <div className="flex space-x-1 ml-32">
-                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover "><Link href="/">Empresas</Link></li>
-                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/">Personas</Link></li>
-                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/">Turnos web</Link></li>
-                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/">Ayuda</Link></li>
+                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover "><Link href="/not-found">Empresas</Link></li>
+                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/not-found">Personas</Link></li>
+                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/not-found">Turnos web</Link></li>
+                        <li className="flex justify-center items-center w-[114px] h-[27px]  hover:text-green-hover"><Link href="/not-found">Ayuda</Link></li>
                     </div>
 
                     <div className="flex mr-4 justify-center items-center">
