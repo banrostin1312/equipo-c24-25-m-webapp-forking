@@ -25,7 +25,9 @@ const Registrarse: React.FC = () => {
     })
     const [emaileErrorMessage, setEmailErrorMessage] = useState<string>("");
     const [passwordErrorMessage, setPasswordErrorMessage] = useState<string>("");
-
+    const [dniErrorMessage,setDniErrorMessage] = useState<string>("");
+    const [backError,setBackError] = useState<string>("");
+    const [ageError,setAgeError] = useState<string>("");
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -44,6 +46,12 @@ const Registrarse: React.FC = () => {
             if (!/^(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(value))
                 setPasswordErrorMessage("");
         }
+
+        if(name === "dni"){
+            if(/^\d{8}$/.test(value)){
+                setDniErrorMessage("");
+            }
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -57,6 +65,14 @@ const Registrarse: React.FC = () => {
         if (!/^(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(dataForm.password)) {
             setPasswordErrorMessage("❌ La contraseña debe tener al menos 8 caracteres, una mayúscula y un carácter especial");
             return;
+        }
+
+        if(!/^\d{8}$/.test(dataForm.dni)){
+            setDniErrorMessage("❌ El DNI debe de contener al menos 8 caracteres");
+            return;
+        }
+        if(dataForm.age < 18){
+            setAgeError("❌ Debes de ser mayor de edad para registrarte");
         }
 
         try {
@@ -84,10 +100,13 @@ const Registrarse: React.FC = () => {
                 "dni": ""
             })
             router.push("/activarCuenta");
-        } catch (error) {
+        } catch (error:any) {
             console.error("ERROR AL REGISTRARSE", error);
-            alert("HUBO UN ERROR AL REGISTRARSE")
-        }
+            if(error.response.status === 409){
+                setBackError("❌ Este DNI ya se encuentra registrado");
+                return;
+            }
+         }
     };
 
     return (
@@ -97,11 +116,12 @@ const Registrarse: React.FC = () => {
 
                 <div className="flex justify-center items-center bg-middle-title md:w-[457px] w-[375px] md:max-w-[457px] h-[60px] "><img src="/LOGOsinbanca.png" alt="Logo" className="w-[166px] h-[60px]" /></div>
                 <form action="" className="flex flex-col justify-center items-center md:w-[343px] md:h-[500px] border-[1px] border-border-forms rounded-[20px] mt-2 mb-2" onSubmit={handleSubmit}>
-                    <label htmlFor="">Nombre:</label>
+                    <label htmlFor="">Nombre Completo:</label>
                     <input value={dataForm.name} onChange={handleChange} type="text" name="name" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
 
                     <label htmlFor="">Edad:</label>
                     <input value={dataForm.age} onChange={handleChange} type="number" name="age" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md  text-center" />
+                    {ageError && <p className="text-red-500 text-sm mt-1 text-center">{ageError}</p>}
 
                     <label htmlFor="">Email:</label>
                     <input value={dataForm.email} onChange={handleChange} type="text" name="email" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
@@ -115,7 +135,8 @@ const Registrarse: React.FC = () => {
 
                     <label htmlFor="">DNI:</label>
                     <input value={dataForm.dni} onChange={handleChange} type="text" name="dni" id="" className="w-[234px] h-[39px] border-2 border-input-border rounded-md text-center" />
-
+                      {dniErrorMessage && <p className="text-red-500 text-sm mt-1 text-center">{dniErrorMessage}</p>}
+                      {backError && <p className="text-red-500 text-sm mt-1 text-center">{backError}</p>}
                     <button type="submit" className="w-[125px] h-[45px] bg-nav-buttons flex justify-center items-center rounded-[30px] mt-8 hover:bg-buttons-hover hover:text-white"><p className="text-[11px]">Registrate</p></button>
                 </form>
             </div>

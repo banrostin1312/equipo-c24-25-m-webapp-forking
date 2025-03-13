@@ -13,6 +13,8 @@ interface NewTransferProps {
 const NewTransfer: React.FC<NewTransferProps> = ({ goBack }) => {
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
     const {accessToken} = useWebApp();
+    const [errorAmountVacio,setErrorAmountVacio] = useState<string>("");
+    const [errorCuentaVacio,setErrorCuentaVacio] = useState<string>("");
 
     
 
@@ -32,6 +34,13 @@ const NewTransfer: React.FC<NewTransferProps> = ({ goBack }) => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
+        if(!dataForm.amount ){
+            setErrorAmountVacio("❌Debes de poner un monto mayor a 0 a transferir");
+        }
+        if(!dataForm.receiverAccountNumber){
+            setErrorCuentaVacio("❌Debes de poner un numero de cuenta al cual transferir");
+        }
         try {
             const response = await axios.post(`${BACKEND_URL}/api/banca/transacciones/transferir`, dataForm,{
                 headers:{
@@ -70,9 +79,11 @@ const NewTransfer: React.FC<NewTransferProps> = ({ goBack }) => {
                     <p className="text-transfer-color text-[28px]">Transferencia</p>
                     <form action="" className="flex flex-col justify-center items-center space-y-4 " onSubmit={handleSubmit}>
                         <input type="text" name="receiverAccountNumber" placeholder={"CBU"} value={dataForm.receiverAccountNumber} className="md:w-[312px] md:h-[44px]  border-[1px] border-transfer-inputs rounded-[8px] placeholder:text-black" onChange={handleChange} />
+                        {errorCuentaVacio && <p className="text-red-500 text-sm mt-1 text-center">{errorCuentaVacio}</p>}
 
                         <input type="number" name="amount" placeholder="MONTO" value={dataForm.amount || ""} className="md:w-[312px] md:h-[44px] border-[1px] border-transfer-inputs rounded-[8px] placeholder:text-black" onChange={handleChange} />
-                        <input type="text" name="transactionDate" readOnly value={dataForm.transactionDate} className="md:w-[312px] md:h-[44px] border-[1px] border-transfer-inputs rounded-[8px] placeholder:text-black" />
+                        {errorAmountVacio && <p className="text-red-500 text-sm mt-1 text-center">{errorAmountVacio}</p>}
+                        <input type="text" name="transactionDate" readOnly value={dataForm.transactionDate} className="hidden md:w-[312px] md:h-[44px] border-[1px] border-transfer-inputs rounded-[8px] placeholder:text-black" />
 
                         <button className="flex flex-col justify-center items-center bg-nav-buttons rounded-[30px] w-[125px] h-[45px] hover:bg-buttons-hover hover:text-white">Enviar Dinero</button>
                     </form>
