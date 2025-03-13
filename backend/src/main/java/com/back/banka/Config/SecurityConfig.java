@@ -1,10 +1,11 @@
 package com.back.banka.Config;
-
 import com.back.banka.Utils.JwtAuthenticationFilter;
 import com.back.banka.Utils.JwtEntryPoint;
 import com.back.banka.Utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,11 +29,15 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final CustomLogoutHandler logoutHandler;
 
-    public SecurityConfig(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+    public SecurityConfig(JwtUtil jwtUtil, UserDetailsService userDetailsService, CustomLogoutHandler logoutHandler) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.logoutHandler = logoutHandler;
     }
+
+
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -69,12 +74,23 @@ public class SecurityConfig {
                 .authorizeHttpRequests( auth ->
 
                         auth.requestMatchers("/api/banca/auth/**",
+                                        "/api/banca/users/recuperar-contrasenia",
+                                        "/api/banca/users/enviar-correo-reestablecer/",
+                                        "/api/banca/users/usuarios",
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
                                         "/v2/api-docs",
                                         "/v3/api-docs",
-                                        "/v3/api-docs/swagger-config").permitAll()
-                                .requestMatchers("/api/banca/cuenta-bancaria/**").hasRole("CLIENT")
+                                        "/v3/api-docs/swagger-config"
+                                        ).permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(
+                                        "/api/banca/cuenta-bancaria/**",
+                                "/api/banca/transacciones/**",
+                                        "/api/banca/users/editar",
+                                        "/api/banca/users/perfil-usuario"
+
+                                ).hasRole("CLIENT")
                         .anyRequest().authenticated())
 
                 .exceptionHandling(exception ->
@@ -84,6 +100,13 @@ public class SecurityConfig {
                                 manage.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 )
+                .logout( logout ->
+                        logout
+                                .logoutUrl("/api/banca/auth/logout")
+                                .addLogoutHandler(logoutHandler)
+                                .logoutSuccessHandler((request, response, authentication)
+                                        -> response.setStatus(HttpStatus.OK.value()) )
+                )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 
@@ -92,12 +115,14 @@ public class SecurityConfig {
 
 
 
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOriginPatterns(List.of("https://equipo-c24-25-m-webapp-forking.vercel.app", "http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

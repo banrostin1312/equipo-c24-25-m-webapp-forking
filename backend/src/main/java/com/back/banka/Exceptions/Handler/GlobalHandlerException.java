@@ -36,7 +36,26 @@ public class GlobalHandlerException {
 
         return new ResponseEntity<>(errorResponseDto,HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(ServiceUnavailableCustomException.class)
+    private ResponseEntity<ErrorResponseDto> serviceUnavailableHandlerException(ServiceUnavailableCustomException exception){
+        ErrorResponseDto  errorResponseDto = ErrorResponseDto.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(exception.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
 
+        return new ResponseEntity<>(errorResponseDto,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @ExceptionHandler(ModelNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleModelNotfoundException(ModelNotFoundException exception){
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .message(exception.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
+
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(InvalidCredentialExceptions.class)
     public ResponseEntity<ErrorResponseDto> handleInvalidCredentials(InvalidCredentialExceptions exception){
@@ -108,10 +127,62 @@ public class GlobalHandlerException {
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
 
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<ErrorResponseDto> handleUserAlreadyExistsException(InsufficientFundsException ex) {
+        ErrorResponseDto errorResponse = ErrorResponseDto.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .message(ex.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
 
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccountStatusException.class)
+    public ResponseEntity<ErrorResponseDto> handleUserAlreadyExistsException(AccountStatusException ex) {
+        ErrorResponseDto errorResponse = ErrorResponseDto.builder()
+                .code(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler(InvalidAmountException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidAmountExceptionException(InvalidAmountException ex) {
+        ErrorResponseDto errorResponse = ErrorResponseDto.builder()
+                .code(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidTransactionsException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidTransactionException(InvalidTransactionsException ex) {
+        ErrorResponseDto errorResponse = ErrorResponseDto.builder()
+                .code(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
+        ErrorResponseDto errorResponse = ErrorResponseDto.builder()
+                .code(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .dateCreation(LocalDate.now())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(DniAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDto> handleDNIAlreadyExistsException(DniAlreadyExistsException ex) {
         ErrorResponseDto errorResponse = ErrorResponseDto.builder()
                 .code(HttpStatus.CONFLICT.value())
                 .message(ex.getMessage())
