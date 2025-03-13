@@ -1,6 +1,6 @@
 "use client"
 //Assets
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import Transaction from "../transaction/Transaction"
 import NewTransfer from "../newTransfer/NewTransfer"
 import axios from "axios"
@@ -16,24 +16,25 @@ const TransactionsView: React.FC = () => {
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
    
-        const getActualBalance = async () => {
-            try {
-                const response = await axios.get(`${BACKEND_URL}/api/banca/cuenta-bancaria/saldo`, {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        "Content-Type": "application/json"
-                    }
-                });
-                setBalance(response.data.balance);
-                console.log("GET SALDO CON EXITO",response.data);
-            } catch (error) {
-              console.log("ERROR AL TRAER EL SALDO",error);
-            }
+    const getActualBalance = useCallback(async () => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/banca/cuenta-bancaria/saldo`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "application/json"
+                }
+            });
+            setBalance(response.data.balance);
+            console.log("GET SALDO CON EXITO", response.data);
+        } catch (error) {
+            console.log("ERROR AL TRAER EL SALDO", error);
         }
-        
-        useEffect(()=> {
-           getActualBalance()
-        },[getActualBalance]);
+    }, [accessToken, BACKEND_URL]);
+
+    useEffect(() => {
+        getActualBalance();
+    }, [getActualBalance]);
+
 
     return (
         <div className="flex flex-col md:justify-between md:flex-row px-20 space-y-4 md:space-y-14 mb-20">
