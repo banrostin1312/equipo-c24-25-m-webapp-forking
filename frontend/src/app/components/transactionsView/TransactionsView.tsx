@@ -33,7 +33,7 @@ const TransactionsView: React.FC = () => {
         
         useEffect(()=> {
            getActualBalance()
-        },[])
+        },[getActualBalance]);
 
     return (
         <div className="flex flex-col md:justify-between md:flex-row px-20 space-y-4 md:space-y-14 mb-20">
