@@ -100,11 +100,15 @@ const Registrarse: React.FC = () => {
                 "dni": ""
             })
             router.push("/activarCuenta");
-        } catch (error:any) {
-            console.error("ERROR AL REGISTRARSE", error);
-            if(error.response.status === 409){
-                setBackError("❌ Este DNI ya se encuentra registrado");
-                return;
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {  
+                console.error("ERROR AL REGISTRARSE", error);
+                if (error.response?.status === 409) {
+                    setBackError("❌ Este DNI ya se encuentra registrado");
+                    return;
+                }
+            } else {
+                console.error("Unexpected error", error);
             }
          }
     };
