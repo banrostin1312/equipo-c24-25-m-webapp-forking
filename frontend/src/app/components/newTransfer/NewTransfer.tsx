@@ -70,11 +70,11 @@ const NewTransfer: React.FC<NewTransferProps> = ({ goBack }) => {
     return (
         <div className="flex flex-col items-center">
             <div className="flex flex-row justify-between md:px-10 md:space-x-80 py-6 space-x-10">
-                <p className="text-[22px] text-nowrap">Saldo Disponible</p>
+                <p className="text-[22px] text-nowrap 2xl:mr-[600px]">Saldo Disponible</p>
                 <p className="text-[20px]"></p>
             </div>
 
-            <div className="flex md:flex-row  flex-col justify-center items-center bg-transfer-bg md:w-[676px] md:h-[418px] w-full h-auto rounded-[20px] space-x-6">
+            <div className="flex md:flex-row  flex-col justify-center items-center bg-transfer-bg md:w-[676px] md:h-[418px] w-full h-auto rounded-[20px] space-x-6 2xl:mr-[600px] ">
                 <div className="flex flex-col justify-center items-center">
                     <p className="text-transfer-color text-[28px]">Transferencia</p>
                     <form action="" className="flex flex-col justify-center items-center space-y-4 " onSubmit={handleSubmit}>
@@ -90,7 +90,7 @@ const NewTransfer: React.FC<NewTransferProps> = ({ goBack }) => {
                 </div>
                 <img src="/LOGO.png" alt="" />
             </div>
-            <button onClick={goBack} className="bg-nav-buttons rounded-[30px] w-[125px] h-[48px] hover:bg-buttons-hover hover:text-white mt-5">Mis Transacciones</button>
+            <button onClick={goBack} className="bg-nav-buttons rounded-[30px] w-[125px] h-[48px] hover:bg-buttons-hover hover:text-white mt-5 2xl:mr-[600px]">Mis Transacciones</button>
 
         </div>
     )
